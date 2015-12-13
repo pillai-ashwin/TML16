@@ -31,8 +31,6 @@ public class HomeActivity extends AppCompatActivity
     private TextView mUsername;
     private TextView mEmail;
 
-    private int flag;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,10 +41,15 @@ public class HomeActivity extends AppCompatActivity
         //1: Skipped
         //2: Logged in
 
+        //Check login status and switch activties accordingly to either Login screen or Home Screen
+
+        //Login Screen
         if (sharedPreferences.getInt("login_status", 0) == 0 | sharedPreferences.getInt("login_status", 0) == 1) {
 
             startActivityForResult(new Intent(this, LoginActivity.class), 0);
         }
+
+        //Home Screen
         else if (sharedPreferences.getInt("login_status", 0) == 2) {
 
             setContentView(R.layout.activity_home);
@@ -64,14 +67,16 @@ public class HomeActivity extends AppCompatActivity
 
             View header = navigationView.getHeaderView(0);
 
+            //Set G+ Profile pic
             mProfilepic = (ImageView) header.findViewById(R.id.profile_pic);
             Uri personPhotoUrl = Uri.parse(sharedPreferences.getString("profile_pic",""));
             new LoadProfileImage(mProfilepic).execute(personPhotoUrl);
 
-
+            //Set G+ Username
             mUsername = (TextView) header.findViewById(R.id.username);
             mUsername.setText(sharedPreferences.getString("username", ""));
 
+            //Set G+ emailId
             mEmail = (TextView) header.findViewById(R.id.email);
             mEmail.setText(sharedPreferences.getString("email",""));
 
@@ -83,6 +88,9 @@ public class HomeActivity extends AppCompatActivity
         super.onBackPressed();
     }
 
+
+    //Handle Login Activity Callback and execute the results obtained.
+    // That is, User's G+ username, emailid and profile pic
     @Override
     protected void onActivityResult(int requestCode, int responseCode, Intent intent) {
         if (requestCode == 0 && responseCode == RESULT_OK) {
@@ -94,6 +102,8 @@ public class HomeActivity extends AppCompatActivity
             editor.putString("email", intent.getStringExtra("email"));
             editor.putString("profile_pic", intent.getStringExtra("profile_pic"));
             editor.apply();
+
+            //Go back to Home screen once logged in.
             startActivity(new Intent(this, HomeActivity.class));
             finish();
         }
@@ -124,6 +134,8 @@ public class HomeActivity extends AppCompatActivity
         return true;
     }
 
+
+    //Handle Profile pic update in background
     private class LoadProfileImage extends AsyncTask<Uri, Void, Bitmap> {
         ImageView bmImage;
 

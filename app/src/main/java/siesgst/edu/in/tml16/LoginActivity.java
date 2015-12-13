@@ -26,6 +26,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        //Set up Goolge Sign in APIs
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .build();
@@ -35,6 +36,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
 
+        //Handle G+ Sign in button action
         mGooleplus = (AppCompatButton) findViewById(R.id.google);
         mGooleplus.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -46,6 +48,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
     @Override
     public void onBackPressed() {
+
     }
 
     private void signIn() {
@@ -53,6 +56,8 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         startActivityForResult(signInIntent, 0);
     }
 
+
+    //Handle Callback of the Login Request action
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -65,6 +70,8 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         }
     }
 
+
+    //Get user information after successful login
     private void handleSignInResult(GoogleSignInResult result) {
 
         if (result.isSuccess()) {
