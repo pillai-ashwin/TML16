@@ -1,11 +1,13 @@
 package siesgst.edu.in.tml16;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatButton;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -13,12 +15,13 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.plus.Plus;
-import com.google.android.gms.plus.model.people.Person;
+
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class LoginActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener{
 
     AppCompatButton mGooleplus;
+    AppCompatButton mSkip;
     private GoogleApiClient mGoogleApiClient;
 
     @Override
@@ -35,6 +38,14 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                 .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
+
+        mSkip = (AppCompatButton) findViewById(R.id.skip);
+        mSkip.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
 
         //Handle G+ Sign in button action
         mGooleplus = (AppCompatButton) findViewById(R.id.google);
@@ -77,18 +88,20 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         if (result.isSuccess()) {
 
             GoogleSignInAccount acct = result.getSignInAccount();
-            Person person = Plus.PeopleApi.getCurrentPerson(mGoogleApiClient);
-            Person.Cover.CoverPhoto cover = person.getCover().getCoverPhoto();
 
             Intent i = new Intent();
             i.putExtra("username", acct.getDisplayName());
             i.putExtra("email", acct.getEmail());
-            i.putExtra("profile_pic", acct.getPhotoUrl().toString());
+            try {
+                i.putExtra("profile_pic", acct.getPhotoUrl().toString());
+            }
+            catch (NullPointerException e) {
+                i.putExtra("profile_pic", "");
+            }
             setResult(RESULT_OK, i);
             finish();
         } else {
-
-
+            Toast.makeText(LoginActivity.this, "Error Signing in.\nPlease check your internet connection or try again.", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -96,5 +109,11 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     public void onConnectionFailed(ConnectionResult connectionResult) {
 
         Log.d("Login", "onConnectionFailed:" + connectionResult);
+        Toast.makeText(LoginActivity.this, "Error Signing in.\nPlease check your internet connection or try again.", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
 }

@@ -44,13 +44,13 @@ public class HomeActivity extends AppCompatActivity
         //Check login status and switch activties accordingly to either Login screen or Home Screen
 
         //Login Screen
-        if (sharedPreferences.getInt("login_status", 0) == 0 | sharedPreferences.getInt("login_status", 0) == 1) {
+        if (sharedPreferences.getInt("login_status", 0) == 0) {
 
             startActivityForResult(new Intent(this, LoginActivity.class), 0);
         }
 
         //Home Screen
-        else if (sharedPreferences.getInt("login_status", 0) == 2) {
+        else if (sharedPreferences.getInt("login_status", 0) == 2 | sharedPreferences.getInt("login_status", 0) == 1) {
 
             setContentView(R.layout.activity_home);
             Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -69,8 +69,10 @@ public class HomeActivity extends AppCompatActivity
 
             //Set G+ Profile pic
             mProfilepic = (ImageView) header.findViewById(R.id.profile_pic);
-            Uri personPhotoUrl = Uri.parse(sharedPreferences.getString("profile_pic",""));
-            new LoadProfileImage(mProfilepic).execute(personPhotoUrl);
+            if (!sharedPreferences.getString("profile_pic","").equals("")) {
+                Uri personPhotoUrl = Uri.parse(sharedPreferences.getString("profile_pic", ""));
+                new LoadProfileImage(mProfilepic).execute(personPhotoUrl);
+            }
 
             //Set G+ Username
             mUsername = (TextView) header.findViewById(R.id.username);
@@ -93,9 +95,11 @@ public class HomeActivity extends AppCompatActivity
     // That is, User's G+ username, emailid and profile pic
     @Override
     protected void onActivityResult(int requestCode, int responseCode, Intent intent) {
+
+        editor = sharedPreferences.edit();
+
         if (requestCode == 0 && responseCode == RESULT_OK) {
 
-            editor = sharedPreferences.edit();
             editor.remove("login_status");
             editor.putInt("login_status", 2);
             editor.putString("username", intent.getStringExtra("username"));
@@ -104,6 +108,13 @@ public class HomeActivity extends AppCompatActivity
             editor.apply();
 
             //Go back to Home screen once logged in.
+            startActivity(new Intent(this, HomeActivity.class));
+            finish();
+        }
+        else if(requestCode == 0 && responseCode == RESULT_CANCELED) {
+            editor.remove("login_status");
+            editor.putInt("login_status", 1);
+            editor.apply();
             startActivity(new Intent(this, HomeActivity.class));
             finish();
         }
