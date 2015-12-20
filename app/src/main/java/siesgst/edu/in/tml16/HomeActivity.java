@@ -170,7 +170,7 @@ public class HomeActivity extends AppCompatActivity
         } else if (id == R.id.sign_out) {
             signOut();
         } else if (id == R.id.profile) {
-
+            startActivity(new Intent(this, ProfileActivity.class));
         } /*else if (id == R.id.nav_manage) {
 
         } else if (id == R.id.nav_share) {
