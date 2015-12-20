@@ -14,15 +14,25 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
+import com.squareup.picasso.Picasso;
 
 import java.io.InputStream;
 
 public class HomeActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.OnConnectionFailedListener {
 
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
@@ -31,9 +41,23 @@ public class HomeActivity extends AppCompatActivity
     private TextView mUsername;
     private TextView mEmail;
 
+    private Menu menu;
+
+    private GoogleApiClient mGoogleApiClient;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //Set up Goolge Sign in APIs
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .build();
 
         sharedPreferences = getSharedPreferences("TML", MODE_PRIVATE);
 
@@ -63,6 +87,7 @@ public class HomeActivity extends AppCompatActivity
             toggle.syncState();
 
             NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+            menu = navigationView.getMenu();
             navigationView.setNavigationItemSelectedListener(this);
 
             View header = navigationView.getHeaderView(0);
@@ -70,17 +95,31 @@ public class HomeActivity extends AppCompatActivity
             //Set G+ Profile pic
             mProfilepic = (ImageView) header.findViewById(R.id.profile_pic);
             if (!sharedPreferences.getString("profile_pic","").equals("")) {
-                Uri personPhotoUrl = Uri.parse(sharedPreferences.getString("profile_pic", ""));
-                new LoadProfileImage(mProfilepic).execute(personPhotoUrl);
+                Picasso.with(this).load(sharedPreferences.getString("profile_pic", "")).into(mProfilepic);
+            } else {
+                mProfilepic.setImageResource(R.mipmap.ic_launcher);
             }
 
             //Set G+ Username
             mUsername = (TextView) header.findViewById(R.id.username);
-            mUsername.setText(sharedPreferences.getString("username", ""));
+            if (sharedPreferences.getInt("login_status", 0) == 1) {
+                mUsername.setText("Hi, Guest!");
+                hideOption(R.id.sign_out);
+                hideOption(R.id.profile);
+                showOption(R.id.sign_in);
+            } else {
+                mUsername.setText(sharedPreferences.getString("username", ""));
+                hideOption(R.id.sign_in);
+                showOption(R.id.sign_out);
+            }
 
             //Set G+ emailId
             mEmail = (TextView) header.findViewById(R.id.email);
-            mEmail.setText(sharedPreferences.getString("email",""));
+            if (sharedPreferences.getInt("login_status", 0) == 1) {
+                mEmail.setVisibility(View.GONE);
+            } else {
+                mEmail.setText(sharedPreferences.getString("email", ""));
+            }
 
         }
     }
@@ -126,49 +165,59 @@ public class HomeActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
+        if (id == R.id.sign_in) {
+            startActivityForResult(new Intent(this, LoginActivity.class), 0);
+        } else if (id == R.id.sign_out) {
+            signOut();
+        } else if (id == R.id.profile) {
 
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
+        } /*else if (id == R.id.nav_manage) {
 
         } else if (id == R.id.nav_share) {
 
         } else if (id == R.id.nav_send) {
 
-        }
+        }*/
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
 
+    private void hideOption(int id)
+    {
+        MenuItem item = menu.findItem(id);
+        item.setVisible(false);
+    }
 
-    //Handle Profile pic update in background
-    private class LoadProfileImage extends AsyncTask<Uri, Void, Bitmap> {
-        ImageView bmImage;
+    private void showOption(int id)
+    {
+        MenuItem item = menu.findItem(id);
+        item.setVisible(true);
+    }
 
-        public LoadProfileImage(ImageView bmImage) {
-            this.bmImage = bmImage;
-        }
+    private void signOut() {
+        editor = sharedPreferences.edit();
+        Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
+                new ResultCallback<Status>() {
+                    @Override
+                    public void onResult(Status status) {
+                        if(status.isSuccess()) {
+                            Toast.makeText(HomeActivity.this, "Signed out...", Toast.LENGTH_SHORT).show();
+                            startActivityForResult(new Intent(HomeActivity.this, LoginActivity.class), 0);
+                            editor.remove("login_status");
+                            editor.remove("username");
+                            editor.remove("email");
+                            editor.remove("profile_pic");
+                            editor.putInt("login_status", 1);
+                            editor.apply();
+                        }
+                    }
+                });
+    }
 
-        protected Bitmap doInBackground(Uri... urls) {
-            Uri urldisplay = urls[0];
-            Bitmap mIcon11 = null;
-            try {
-                InputStream in = new java.net.URL(urldisplay.toString()).openStream();
-                mIcon11 = BitmapFactory.decodeStream(in);
-            } catch (Exception e) {
-                Log.e("Error", e.getMessage());
-                e.printStackTrace();
-            }
-            return mIcon11;
-        }
-
-        protected void onPostExecute(Bitmap result) {
-            bmImage.setImageBitmap(result);
-        }
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        Toast.makeText(HomeActivity.this, "Error Signing in.\nPlease check your internet connection or try again.", Toast.LENGTH_SHORT).show();
     }
 }

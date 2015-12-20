@@ -2,10 +2,11 @@ package siesgst.edu.in.tml16;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatButton;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -20,8 +21,8 @@ import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class LoginActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener{
 
-    AppCompatButton mGooleplus;
-    AppCompatButton mSkip;
+    private AppCompatButton mGooleplus;
+    private AppCompatButton mSkip;
     private GoogleApiClient mGoogleApiClient;
 
     @Override
@@ -52,7 +53,11 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         mGooleplus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                signIn();
+                if(checkConnection()) {
+                    signIn();
+                } else {
+                    Toast.makeText(LoginActivity.this, "Error Signing in.\nPlease check your internet connection or try again.", Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }
@@ -107,13 +112,20 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
-
-        Log.d("Login", "onConnectionFailed:" + connectionResult);
         Toast.makeText(LoginActivity.this, "Error Signing in.\nPlease check your internet connection or try again.", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+    }
+
+    public boolean checkConnection() {
+        final ConnectivityManager ComMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        final NetworkInfo nwInfo = ComMgr.getActiveNetworkInfo();
+        if (nwInfo != null && nwInfo.isConnected())
+            return true;
+        else
+        return false;
     }
 }

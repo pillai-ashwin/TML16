@@ -57,6 +57,11 @@
         </LinearLayout>
     </android.support.v7.widget.Toolbar>
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="5dp"
+        android:background="@drawable/toolbar_shadow" />
+
     <in.championswimmer.libsocialbuttons.buttons.BtnGoogleplus
         android:id="@+id/google"
         android:layout_width="290dp"
@@ -64,18 +69,7 @@
         android:text="Log In with Google+"
         android:textSize="20sp"
         android:layout_gravity="center"
-        android:layout_alignLeft="@+id/fb"
-        android:layout_alignStart="@+id/fb"
-        android:layout_marginTop="50dp"/>
-
-    <in.championswimmer.libsocialbuttons.buttons.BtnFacebook
-        android:id="@+id/fb"
-        android:layout_width="290dp"
-        android:layout_height="wrap_content"
-        android:text="Log In with Facebook"
-        android:textSize="20sp"
-        android:layout_below="@+id/google"
-        android:layout_gravity="center" />
+        android:layout_marginTop="80dp"/>
 
     <android.support.v7.widget.AppCompatButton
         android:id="@+id/skip"
