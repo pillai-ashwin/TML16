@@ -94,7 +94,7 @@ public class HomeActivity extends AppCompatActivity
 
             //Set G+ Profile pic
             mProfilepic = (ImageView) header.findViewById(R.id.profile_pic);
-            if (!sharedPreferences.getString("profile_pic","").equals("")) {
+            if (!sharedPreferences.getString("profile_pic", "").equals("")) {
                 Picasso.with(this).load(sharedPreferences.getString("profile_pic", "")).into(mProfilepic);
             } else {
                 mProfilepic.setImageResource(R.mipmap.ic_launcher);
@@ -149,8 +149,7 @@ public class HomeActivity extends AppCompatActivity
             //Go back to Home screen once logged in.
             startActivity(new Intent(this, HomeActivity.class));
             finish();
-        }
-        else if(requestCode == 0 && responseCode == RESULT_CANCELED) {
+        } else if (requestCode == 0 && responseCode == RESULT_CANCELED) {
             editor.remove("login_status");
             editor.putInt("login_status", 1);
             editor.apply();
@@ -166,11 +165,26 @@ public class HomeActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.sign_in) {
-            startActivityForResult(new Intent(this, LoginActivity.class), 0);
+            new Thread() {
+                @Override
+                public void run() {
+                    startActivityForResult(new Intent(HomeActivity.this, LoginActivity.class), 0);
+                }
+            }.start();
         } else if (id == R.id.sign_out) {
-            signOut();
+            new Thread() {
+                @Override
+                public void run() {
+                    signOut();
+                }
+            }.start();
         } else if (id == R.id.profile) {
-            startActivity(new Intent(this, ProfileActivity.class));
+            new Thread() {
+                @Override
+                public void run() {
+                    startActivity(new Intent(HomeActivity.this, ProfileActivity.class));
+                }
+            }.start();
         } /*else if (id == R.id.nav_manage) {
 
         } else if (id == R.id.nav_share) {
@@ -184,14 +198,12 @@ public class HomeActivity extends AppCompatActivity
         return true;
     }
 
-    private void hideOption(int id)
-    {
+    private void hideOption(int id) {
         MenuItem item = menu.findItem(id);
         item.setVisible(false);
     }
 
-    private void showOption(int id)
-    {
+    private void showOption(int id) {
         MenuItem item = menu.findItem(id);
         item.setVisible(true);
     }
@@ -202,9 +214,14 @@ public class HomeActivity extends AppCompatActivity
                 new ResultCallback<Status>() {
                     @Override
                     public void onResult(Status status) {
-                        if(status.isSuccess()) {
+                        if (status.isSuccess()) {
                             Toast.makeText(HomeActivity.this, "Signed out...", Toast.LENGTH_SHORT).show();
-                            startActivityForResult(new Intent(HomeActivity.this, LoginActivity.class), 0);
+                            new Thread() {
+                                @Override
+                                public void run() {
+                                    startActivityForResult(new Intent(HomeActivity.this, LoginActivity.class), 0);
+                                }
+                            }.start();
                             editor.remove("login_status");
                             editor.remove("username");
                             editor.remove("email");
