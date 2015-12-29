@@ -13,10 +13,10 @@ import com.google.zxing.qrcode.QRCodeWriter;
  */
 public class QRinterface {
 
-    public Bitmap encodeQRcode(String data){
+    public Bitmap encodeQRcode(String data, int width, int height){
         QRCodeWriter writerInstance = new QRCodeWriter();
         try{
-            BitMatrix matrix = writerInstance.encode(data,BarcodeFormat.QR_CODE,400,400);
+            BitMatrix matrix = writerInstance.encode(data,BarcodeFormat.QR_CODE,width,height);
             return toBitmap(matrix);
         }
         catch(WriterException exception){
