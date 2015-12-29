@@ -148,6 +148,12 @@ public class HomeActivity extends AppCompatActivity
             editor.apply();
             startActivity(new Intent(this, HomeActivity.class));
             finish();
+        } else if (requestCode == 0 && responseCode == 1) {
+            if(sharedPreferences.getBoolean("first_time", true)){
+                if(sharedPreferences.getInt("login_status", 0) == 0) {
+                    finish();
+                }
+            }
         }
     }
 

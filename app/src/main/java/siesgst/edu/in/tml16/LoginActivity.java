@@ -19,7 +19,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
-public class LoginActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener{
+public class LoginActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
 
     private AppCompatButton mGooleplus;
     private AppCompatButton mSkip;
@@ -44,6 +44,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         mSkip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                setResult(RESULT_CANCELED);
                 finish();
             }
         });
@@ -53,7 +54,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         mGooleplus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(checkConnection()) {
+                if (checkConnection()) {
                     signIn();
                 } else {
                     Toast.makeText(LoginActivity.this, "Error Signing in.\nPlease check your internet connection or try again.", Toast.LENGTH_SHORT).show();
@@ -64,7 +65,8 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
     @Override
     public void onBackPressed() {
-
+        setResult(1);
+        finish();
     }
 
     private void signIn() {
@@ -99,8 +101,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             i.putExtra("email", acct.getEmail());
             try {
                 i.putExtra("profile_pic", acct.getPhotoUrl().toString());
-            }
-            catch (NullPointerException e) {
+            } catch (NullPointerException e) {
                 i.putExtra("profile_pic", "");
             }
             setResult(RESULT_OK, i);
@@ -126,6 +127,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         if (nwInfo != null && nwInfo.isConnected())
             return true;
         else
-        return false;
+            return false;
     }
 }
