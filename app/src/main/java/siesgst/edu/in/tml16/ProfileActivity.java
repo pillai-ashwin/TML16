@@ -1,21 +1,21 @@
 package siesgst.edu.in.tml16;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.Preference;
 import android.preference.PreferenceActivity;
-import android.preference.PreferenceGroup;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.AppCompatButton;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
+
+import siesgst.edu.in.tml16.utils.QRInterface;
 
 public class ProfileActivity extends PreferenceActivity {
 
@@ -50,8 +50,33 @@ public class ProfileActivity extends PreferenceActivity {
         mEmail = (TextView) profile.findViewById(R.id.text_email);
         mEmail.setText(sharedPreferences.getString("email", ""));
 
+        Preference regCode = (Preference) findPreference("reg_code");
+        regCode.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                launchQR();
+                return false;
+            }
+        });
+
         ListView listView = getListView();
         listView.addHeaderView(profile);
     }
 
+    public void launchQR() {
+        final Dialog alertDialog = new Dialog(this);
+        View qr = getLayoutInflater().inflate(R.layout.qr_code_layout, null);
+        alertDialog.setContentView(qr);
+        AppCompatButton qrButton = (AppCompatButton) alertDialog.findViewById(R.id.qr_code_button);
+        qrButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                alertDialog.dismiss();
+            }
+        });
+
+        QRInterface qrInterface = new QRInterface();
+        ((ImageView) alertDialog.findViewById(R.id.qr_code_image)).setImageBitmap(qrInterface.encodeQRcode("TML2016_0001", 200, 200));
+        alertDialog.show();
+    }
 }
