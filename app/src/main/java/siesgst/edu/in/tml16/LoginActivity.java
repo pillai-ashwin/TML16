@@ -7,6 +7,7 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatButton;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -17,6 +18,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 
+import siesgst.edu.in.tml16.utils.ConnectionUtils;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class LoginActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
@@ -54,7 +56,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         mGooleplus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (checkConnection()) {
+                if ((new ConnectionUtils(LoginActivity.this)).checkConnection()) {
                     signIn();
                 } else {
                     Toast.makeText(LoginActivity.this, "Error Signing in.\nPlease check your internet connection or try again.", Toast.LENGTH_SHORT).show();
@@ -119,14 +121,5 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     @Override
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
-    }
-
-    public boolean checkConnection() {
-        final ConnectivityManager ComMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        final NetworkInfo nwInfo = ComMgr.getActiveNetworkInfo();
-        if (nwInfo != null && nwInfo.isConnected())
-            return true;
-        else
-            return false;
     }
 }
