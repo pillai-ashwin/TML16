@@ -9,6 +9,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,6 +24,12 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.squareup.picasso.Picasso;
+
+import org.json.JSONException;
+
+import java.io.IOException;
+
+import siesgst.edu.in.tml16.utils.OnlineDBDownloader;
 
 public class HomeActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.OnConnectionFailedListener {
@@ -41,6 +48,7 @@ public class HomeActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
 
         //Set up Goolge Sign in APIs
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -149,8 +157,8 @@ public class HomeActivity extends AppCompatActivity
             startActivity(new Intent(this, HomeActivity.class));
             finish();
         } else if (requestCode == 0 && responseCode == 1) {
-            if(sharedPreferences.getBoolean("first_time", true)){
-                if(sharedPreferences.getInt("login_status", 0) == 0) {
+            if (sharedPreferences.getBoolean("first_time", true)) {
+                if (sharedPreferences.getInt("login_status", 0) == 0) {
                     finish();
                 }
             }
