@@ -4,6 +4,7 @@ import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -18,28 +19,29 @@ import java.net.URL;
 public class OnlineDBDownloader {
 
     private JSONArray JSON;
-    final String link = "http://api.androidhive.info/contacts/";
-
+    private JSONObject object;
+    final String link = "http://development.siesgst.ac.in/test.php";
     public OnlineDBDownloader() {
 
     }
 
-    public void downloadData() throws IOException, JSONException {
-        InputStream is = null;
-
-        URL url = new URL(link);
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setReadTimeout(10000);
-        conn.setConnectTimeout(15000);
-        conn.setRequestMethod("POST");
-        conn.setDoInput(true);
-        conn.connect();
-        int response = conn.getResponseCode();
-        Log.d("TML", "The response is: " + response);
-        JSON = new JSONArray(convertStreamToString(conn.getInputStream()));
-        if (is != null) {
-            is.close();
+    public void downloadData() {
+        try {
+            URL url = new URL(link);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setReadTimeout(10000);
+            conn.setConnectTimeout(15000);
+            conn.setRequestMethod("POST");
+            conn.setDoInput(true);
+            conn.connect();
+            System.out.print((object = new JSONObject(convertStreamToString(conn.getInputStream()))).getJSONArray("events"));
+            JSON = object.getJSONArray("events");
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
+
     }
 
     // Reads an InputStream and converts it to a String.
@@ -47,7 +49,7 @@ public class OnlineDBDownloader {
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
         StringBuilder sb = new StringBuilder();
 
-        String line = null;
+        String line;
         try {
             while ((line = reader.readLine()) != null) {
                 sb.append(line).append('\n');
@@ -56,6 +58,7 @@ public class OnlineDBDownloader {
             e.printStackTrace();
         } finally {
             try {
+                if (is != null)
                 is.close();
             } catch (IOException e) {
                 e.printStackTrace();

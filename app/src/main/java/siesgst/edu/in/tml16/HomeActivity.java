@@ -2,6 +2,7 @@ package siesgst.edu.in.tml16;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -25,10 +26,10 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.squareup.picasso.Picasso;
 
-import org.json.JSONException;
+import org.json.JSONArray;
 
-import java.io.IOException;
-
+import siesgst.edu.in.tml16.utils.ConnectionUtils;
+import siesgst.edu.in.tml16.utils.DataHandler;
 import siesgst.edu.in.tml16.utils.OnlineDBDownloader;
 
 public class HomeActivity extends AppCompatActivity
@@ -48,7 +49,6 @@ public class HomeActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
 
         //Set up Goolge Sign in APIs
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -71,11 +71,13 @@ public class HomeActivity extends AppCompatActivity
         //Login Screen
         if (sharedPreferences.getInt("login_status", 0) == 0) {
 
-            startActivityForResult(new Intent(this, LoginActivity.class), 0);
+            startActivityForResult(new Intent(this, FacebookActivity.class), 0);
         }
 
         //Home Screen
         else if (sharedPreferences.getInt("login_status", 0) == 2 | sharedPreferences.getInt("login_status", 0) == 1) {
+
+            new EventListDownload().execute();
 
             setContentView(R.layout.activity_home);
             Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -243,5 +245,23 @@ public class HomeActivity extends AppCompatActivity
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
         Toast.makeText(HomeActivity.this, "Error Signing in.\nPlease check your internet connection or try again.", Toast.LENGTH_SHORT).show();
+    }
+
+    private class EventListDownload extends AsyncTask<Void, Void, JSONArray> {
+        JSONArray array;
+
+        @Override
+        protected JSONArray doInBackground(Void... params) {
+            OnlineDBDownloader downloader = new OnlineDBDownloader();
+            downloader.downloadData();
+            array = downloader.getJSON();
+            return array;
+        }
+
+        @Override
+        protected void onPostExecute(JSONArray jsonArray) {
+            new DataHandler(HomeActivity.this).decodeAndPushJSON(jsonArray);
+
+        }
     }
 }

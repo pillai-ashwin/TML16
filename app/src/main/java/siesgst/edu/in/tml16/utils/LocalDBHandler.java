@@ -8,6 +8,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.renderscript.ScriptIntrinsicYuvToRGB;
 import android.util.Log;
 
+import java.util.ArrayList;
+
 /**
  * Created by vishal on 1/1/16.
  */
@@ -103,6 +105,7 @@ public class LocalDBHandler extends SQLiteOpenHelper {
         Cursor cursor = db.query(USER_TABLE_NAME, new String[]{U_NAME}, null, null, null, null, null);
         if (cursor != null && cursor.getCount() > 0) {
             Log.d("TML", "DATABASE ENTRIES: " + cursor.getCount());
+            cursor.close();
             db.close();
             return true;
         }
@@ -153,4 +156,16 @@ public class LocalDBHandler extends SQLiteOpenHelper {
         db.close();
     }
 
+    public ArrayList<String> getEventNames() {
+        SQLiteDatabase db=getReadableDatabase();
+        Cursor cursor = db.query(EVENT_TABLE_NAME, new String[] {E_NAME}, null, null, null, null, null);
+        ArrayList<String> arrayList = new ArrayList<>();
+        for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+            arrayList.add(cursor.getString(cursor.getColumnIndex(E_NAME)));
+        }
+        cursor.close();
+        db.close();
+
+        return arrayList;
+    }
 }
