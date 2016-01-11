@@ -1,6 +1,5 @@
 package siesgst.edu.in.tml16.utils;
 
-import android.animation.ObjectAnimator;
 import android.content.Context;
 
 import org.json.JSONArray;
@@ -14,7 +13,6 @@ public class DataHandler {
 
     Context context;
     JSONArray dataArray;
-    JSONArray eventDataArray;
 
     public DataHandler(Context context) {
         this.context = context;

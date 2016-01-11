@@ -158,7 +158,7 @@ public class LocalDBHandler extends SQLiteOpenHelper {
 
     public ArrayList<String> getEventNames() {
         SQLiteDatabase db=getReadableDatabase();
-        Cursor cursor = db.query(EVENT_TABLE_NAME, new String[] {E_NAME}, null, null, null, null, null);
+        Cursor cursor = db.query(EVENT_TABLE_NAME, new String[] {E_NAME}, null, null, null, null, null, null);
         ArrayList<String> arrayList = new ArrayList<>();
         for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
             arrayList.add(cursor.getString(cursor.getColumnIndex(E_NAME)));
@@ -167,5 +167,9 @@ public class LocalDBHandler extends SQLiteOpenHelper {
         db.close();
 
         return arrayList;
+    }
+
+    public int getDBVersion() {
+        return DB_VERSION;
     }
 }

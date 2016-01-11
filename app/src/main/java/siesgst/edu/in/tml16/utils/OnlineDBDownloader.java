@@ -34,7 +34,7 @@ public class OnlineDBDownloader {
             conn.setRequestMethod("POST");
             conn.setDoInput(true);
             conn.connect();
-            System.out.print((object = new JSONObject(convertStreamToString(conn.getInputStream()))).getJSONArray("events"));
+            object = new JSONObject(convertStreamToString(conn.getInputStream()));
             JSON = object.getJSONArray("events");
         } catch (IOException e) {
             e.printStackTrace();

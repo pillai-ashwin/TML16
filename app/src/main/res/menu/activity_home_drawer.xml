@@ -1,16 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group
+        android:id="@+id/group1"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/news"
+            android:title="News" />
+    </group>
 
-    <group android:checkableBehavior="single">
+    <item android:title="Events">
+        <menu>
+            <item
+                android:id="@+id/tatva"
+                android:title="Tatva" />
+            <item
+                android:id="@+id/moksh"
+                android:title="Moksh" />
+            <item
+                android:id="@+id/lakshya"
+                android:title="Lakshya" />
+        </menu>
+    </item>
+    <group android:id="@+id/group2">
+        <item
+            android:id="@+id/venue"
+            android:title="Venue" />
         <item
             android:id="@+id/profile"
-            android:title="Profile"
-            android:icon="@drawable/ic_face_black"/>
+            android:icon="@drawable/ic_face_black"
+            android:title="Profile" />
         <item
             android:id="@+id/sign_out"
             android:title="Sign Out" />
         <item
-        android:id="@+id/sign_in"
-        android:title="Sign In" />
+            android:id="@+id/sign_in"
+            android:title="Sign In" />
     </group>
 </menu>

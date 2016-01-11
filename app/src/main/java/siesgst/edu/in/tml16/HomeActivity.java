@@ -1,16 +1,19 @@
 package siesgst.edu.in.tml16;
 
+import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -28,8 +31,10 @@ import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 
+import siesgst.edu.in.tml16.fragments.TatvaEventsFragment;
 import siesgst.edu.in.tml16.utils.ConnectionUtils;
 import siesgst.edu.in.tml16.utils.DataHandler;
+import siesgst.edu.in.tml16.utils.LocalDBHandler;
 import siesgst.edu.in.tml16.utils.OnlineDBDownloader;
 
 public class HomeActivity extends AppCompatActivity
@@ -43,8 +48,11 @@ public class HomeActivity extends AppCompatActivity
     private TextView mEmail;
 
     private Menu menu;
+    private ProgressDialog progressDialog;
 
     private GoogleApiClient mGoogleApiClient;
+
+    final private String dbVersion = "DB_VERSION";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,13 +79,11 @@ public class HomeActivity extends AppCompatActivity
         //Login Screen
         if (sharedPreferences.getInt("login_status", 0) == 0) {
 
-            startActivityForResult(new Intent(this, FacebookActivity.class), 0);
+            startActivityForResult(new Intent(this, LoginActivity.class), 0);
         }
 
         //Home Screen
         else if (sharedPreferences.getInt("login_status", 0) == 2 | sharedPreferences.getInt("login_status", 0) == 1) {
-
-            new EventListDownload().execute();
 
             setContentView(R.layout.activity_home);
             Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -124,7 +130,54 @@ public class HomeActivity extends AppCompatActivity
                 mEmail.setText(sharedPreferences.getString("email", ""));
             }
 
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    checkDatabaseIntegrity();
+                }
+            }, 2000);
+
         }
+    }
+
+    public void checkDatabaseIntegrity() {
+
+        int currentDBVersion = sharedPreferences.getInt(dbVersion, 0);
+        if ((new LocalDBHandler(this)).getDBVersion() > currentDBVersion) {
+            progressDialog = ProgressDialog.show(this, "Syncing Data", "Please wait....");
+            if ((new ConnectionUtils(this).checkConnection())) {
+                new LocalDBHandler(this).wapasTableBana();
+                new EventListDownload().execute();
+            } else {
+                showError();
+            }
+        }
+    }
+
+    public void showError() {
+        final Dialog dialog = new Dialog(this);
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.setTitle("Please check your internet connection and try again.");
+        View qr = getLayoutInflater().inflate(R.layout.error_layout, null);
+        dialog.setContentView(qr);
+
+        AppCompatButton appCompatButton1 = (AppCompatButton) dialog.findViewById(R.id.cancel);
+        AppCompatButton appCompatButton2 = (AppCompatButton) dialog.findViewById(R.id.try_again);
+
+        appCompatButton1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+        appCompatButton2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                checkDatabaseIntegrity();
+            }
+        });
+
     }
 
     @Override
@@ -174,29 +227,16 @@ public class HomeActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.sign_in) {
-            new Thread() {
-                @Override
-                public void run() {
-                    startActivityForResult(new Intent(HomeActivity.this, LoginActivity.class), 0);
-                }
-            }.start();
+            startActivityForResult(new Intent(HomeActivity.this, LoginActivity.class), 0);
         } else if (id == R.id.sign_out) {
-            new Thread() {
-                @Override
-                public void run() {
-                    signOut();
-                }
-            }.start();
+            signOut();
         } else if (id == R.id.profile) {
-            new Thread() {
-                @Override
-                public void run() {
-                    startActivity(new Intent(HomeActivity.this, ProfileActivity.class));
-                }
-            }.start();
-        } /*else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
+            startActivity(new Intent(HomeActivity.this, ProfileActivity.class));
+        } else if (id == R.id.tatva) {
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.root_frame, new TatvaEventsFragment())
+                    .commit();
+        } /*else if (id == R.id.nav_share) {
 
         } else if (id == R.id.nav_send) {
 
@@ -261,6 +301,10 @@ public class HomeActivity extends AppCompatActivity
         @Override
         protected void onPostExecute(JSONArray jsonArray) {
             new DataHandler(HomeActivity.this).decodeAndPushJSON(jsonArray);
+            SharedPreferences.Editor editor=sharedPreferences.edit();
+            editor.putInt(dbVersion, new LocalDBHandler(getApplicationContext()).getDBVersion());
+            editor.commit();
+            progressDialog.dismiss();
 
         }
     }

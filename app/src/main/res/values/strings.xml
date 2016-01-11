@@ -7,4 +7,7 @@
     <string name="title_activity_profile">ProfileActivity</string>
     <string name="facebook_app_id">1673241409613401</string>
     <string name="facebook_app_id_secret">e23ab646a1b5d1944ee17ba0a951507b</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
