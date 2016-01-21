@@ -33,11 +33,15 @@ public class DataHandler {
                 data[0] = object.getString("eName");
                 data[1] = object.getString("eDay");
                 data[2] = object.getString("eTime");
-                data[3] = object.getString("eCategory");
-                data[4] = object.getString("eHead1");
-                data[5] = object.getString("ePhone1");
-                data[6] = object.getString("eHead2");
-                data[7] = object.getString("ePhone2");
+                data[3] = object.getString("eVenue");
+                data[4] = object.getString("eCategory");
+                data[5] = object.getString("eDetail");
+                data[6] = object.getString("eHead1");
+                data[7] = object.getString("ePhone1");
+                data[8] = object.getString("eHead2");
+                data[9] = object.getString("ePhone2");
+                data[10] = object.getString("eCreated");
+                data[11] = object.getString("eModified");
 
                 new LocalDBHandler(context).insertEventData(data);
             }

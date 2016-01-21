@@ -1,7 +1,8 @@
 package siesgst.edu.in.tml16;
 
-import android.app.Dialog;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -12,7 +13,6 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -31,6 +31,9 @@ import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 
+import siesgst.edu.in.tml16.fragments.LakshyaEventsFragment;
+import siesgst.edu.in.tml16.fragments.NewsFragment;
+import siesgst.edu.in.tml16.fragments.RegistrationFragment;
 import siesgst.edu.in.tml16.fragments.TatvaEventsFragment;
 import siesgst.edu.in.tml16.utils.ConnectionUtils;
 import siesgst.edu.in.tml16.utils.DataHandler;
@@ -149,35 +152,23 @@ public class HomeActivity extends AppCompatActivity
                 new LocalDBHandler(this).wapasTableBana();
                 new EventListDownload().execute();
             } else {
+                progressDialog.dismiss();
                 showError();
             }
         }
     }
 
     public void showError() {
-        final Dialog dialog = new Dialog(this);
-        dialog.setCanceledOnTouchOutside(false);
-        dialog.setTitle("Please check your internet connection and try again.");
-        View qr = getLayoutInflater().inflate(R.layout.error_layout, null);
-        dialog.setContentView(qr);
-
-        AppCompatButton appCompatButton1 = (AppCompatButton) dialog.findViewById(R.id.cancel);
-        AppCompatButton appCompatButton2 = (AppCompatButton) dialog.findViewById(R.id.try_again);
-
-        appCompatButton1.setOnClickListener(new View.OnClickListener() {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+        alertDialog.setTitle("Please check your internet connection and try again.");
+        alertDialog.setPositiveButton("Try Again", new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                dialog.dismiss();
-            }
-        });
-
-        appCompatButton2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+            public void onClick(DialogInterface dialog, int which) {
                 checkDatabaseIntegrity();
             }
         });
-
+        alertDialog.create();
+        alertDialog.show();
     }
 
     @Override
@@ -226,24 +217,48 @@ public class HomeActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.sign_in) {
-            startActivityForResult(new Intent(HomeActivity.this, LoginActivity.class), 0);
-        } else if (id == R.id.sign_out) {
-            signOut();
-        } else if (id == R.id.profile) {
-            startActivity(new Intent(HomeActivity.this, ProfileActivity.class));
-        } else if (id == R.id.tatva) {
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.root_frame, new TatvaEventsFragment())
-                    .commit();
-        } /*else if (id == R.id.nav_share) {
+        switch (id) {
+            case R.id.sign_in :
+                startActivityForResult(new Intent(HomeActivity.this, LoginActivity.class), 0);
+                break;
+            case R.id.sign_out :
+                signOut();
+                break;
+            case R.id.profile :
+                startActivity(new Intent(HomeActivity.this, ProfileActivity.class));
+                break;
+            case R.id.tatva :
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.root_frame, new TatvaEventsFragment())
+                        .commit();
+                break;
+            case R.id.moksh :
+                break;
+            case R.id.lakshya :
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.root_frame, new LakshyaEventsFragment())
+                        .commit();
+                break;
 
-        } else if (id == R.id.nav_send) {
+            case R.id.news :
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.root_frame, new NewsFragment())
+                        .commit();
+                break;
 
-        }*/
+            case R.id.venue :
+                break;
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
+            case R.id.register :
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.root_frame, new RegistrationFragment())
+                        .commit();
+                break;
+
+            }
+
+            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+            drawer.closeDrawer(GravityCompat.START);
         return true;
     }
 
@@ -303,7 +318,7 @@ public class HomeActivity extends AppCompatActivity
             new DataHandler(HomeActivity.this).decodeAndPushJSON(jsonArray);
             SharedPreferences.Editor editor=sharedPreferences.edit();
             editor.putInt(dbVersion, new LocalDBHandler(getApplicationContext()).getDBVersion());
-            editor.commit();
+            editor.apply();
             progressDialog.dismiss();
 
         }

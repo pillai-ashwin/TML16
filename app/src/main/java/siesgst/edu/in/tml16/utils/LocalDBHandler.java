@@ -32,10 +32,13 @@ public class LocalDBHandler extends SQLiteOpenHelper {
     final String E_TIME = "eTime";
     final String E_VENUE = "eVenue";
     final String E_CATEGORY = "eCategory";
+    final String E_DETAIL = "eDetail";
     final String EVENT_HEAD_1 = "eHead1";
     final String EVENT_HEAD_2 = "eHead2";
     final String E_PHONE_1 = "ePhone1";
     final String E_PHONE_2 = "ePhone2";
+    final String E_CREATED = "eCreated";
+    final String E_MODIFIED = "eModified";
 
     final String PAYMENT_STATUS = "pStatus";
 
@@ -62,10 +65,13 @@ public class LocalDBHandler extends SQLiteOpenHelper {
             "eTime VARCHAR DEFAULT NULL," +
             "eVenue VARCHAR DEFAULT NULL," +
             "eCategory VARCHAR DEFAULT NULL," +
+            "eDetail VARCHAR DEFAULT NULL" +
             "eHead1 VARCHAR DEFAULT NULL," +
             "ePhone1 VARCHAR DEFAULT NULL," +
             "eHead2 VARCHAR DEFAULT NULL," +
-            "ePhone2 VARCHAR DEFAULT NULL)";
+            "ePhone2 VARCHAR DEFAULT NULL," +
+            "eCreated VARCHAR DEFAULT NULL," +
+            "eModified VARCHAR DEFAULT NULL)";
 
     final String CREATE_REG_TABLE = "CREATE TABLE IF NOT EXISTS reg_table(uID VARCHAR DEFAULT NULL," +
             "eID VARCHAR DEFAULT NULL," +
@@ -138,10 +144,13 @@ public class LocalDBHandler extends SQLiteOpenHelper {
         values.put(E_TIME, data[2]);
         values.put(E_VENUE, data[3]);
         values.put(E_CATEGORY, data[4]);
-        values.put(EVENT_HEAD_1, data[5]);
-        values.put(E_PHONE_1, data[6]);
-        values.put(EVENT_HEAD_2, data[7]);
-        values.put(E_PHONE_2, data[8]);
+        values.put(E_DETAIL, data[5]);
+        values.put(EVENT_HEAD_1, data[6]);
+        values.put(E_PHONE_1, data[7]);
+        values.put(EVENT_HEAD_2, data[8]);
+        values.put(E_PHONE_2, data[9]);
+        values.put(E_CREATED, data[10]);
+        values.put(E_MODIFIED, data[11]);
         db.insert(EVENT_TABLE_NAME, null, values);
         db.close();
     }
@@ -156,9 +165,9 @@ public class LocalDBHandler extends SQLiteOpenHelper {
         db.close();
     }
 
-    public ArrayList<String> getEventNames() {
+    public ArrayList<String> getEventNames(String category) {
         SQLiteDatabase db=getReadableDatabase();
-        Cursor cursor = db.query(EVENT_TABLE_NAME, new String[] {E_NAME}, null, null, null, null, null, null);
+        Cursor cursor = db.query(EVENT_TABLE_NAME, new String[] {E_NAME}, E_CATEGORY + "='" + category + "'", null, null, null, null, null);
         ArrayList<String> arrayList = new ArrayList<>();
         for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
             arrayList.add(cursor.getString(cursor.getColumnIndex(E_NAME)));

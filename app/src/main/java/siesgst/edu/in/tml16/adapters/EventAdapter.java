@@ -26,9 +26,9 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
         this.context = context;
         feedEventsList = new ArrayList<>();
 
-        for (int i = 0; i < ((new LocalDBHandler(context)).getEventNames()).size(); i++) {
+        for (int i = 0; i < ((new LocalDBHandler(context)).getEventNames(category)).size(); i++) {
             FeedEvents feedEvents = new FeedEvents();
-            feedEvents.setEventName((new LocalDBHandler(context)).getEventNames().get(i) );
+            feedEvents.setEventName((new LocalDBHandler(context)).getEventNames(category).get(i) );
             feedEventsList.add(feedEvents);
         }
     }
