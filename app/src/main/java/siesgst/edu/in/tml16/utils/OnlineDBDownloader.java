@@ -1,6 +1,9 @@
 package siesgst.edu.in.tml16.utils;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -10,8 +13,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.Charset;
 
 /**
  * Created by vishal on 30/12/15.
@@ -19,29 +24,73 @@ import java.net.URL;
 public class OnlineDBDownloader {
 
     private JSONArray JSON;
-    private JSONObject object;
-    final String link = "http://development.siesgst.ac.in/test.php";
-    public OnlineDBDownloader() {
+    final String link = "http://tml.siesgst.ac.in/includes/resources.php";
+    final String regLink = "http://tml.siesgst.ac.in/validate/index.php";
 
+    Context context;
+
+    SharedPreferences sharedPreferences;
+    SharedPreferences.Editor editor;
+
+    public OnlineDBDownloader(Context context) {
+        this.context = context;
     }
 
     public void downloadData() {
+        HttpURLConnection conn = null;
         try {
             URL url = new URL(link);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setReadTimeout(10000);
-            conn.setConnectTimeout(15000);
+            conn = (HttpURLConnection) url.openConnection();
+            conn.setReadTimeout(100000);
+            conn.setConnectTimeout(150000);
             conn.setRequestMethod("POST");
             conn.setDoInput(true);
             conn.connect();
-            object = new JSONObject(convertStreamToString(conn.getInputStream()));
+            JSONObject object = new JSONObject(convertStreamToString(conn.getInputStream()));
             JSON = object.getJSONArray("events");
         } catch (IOException e) {
             e.printStackTrace();
         } catch (JSONException e) {
             e.printStackTrace();
+        } finally {
+            if (conn != null)
+                conn.disconnect();
         }
 
+    }
+
+    public void submitRegData(String fullName, String emailID, String phone, String year, String branch, String college, String division, String rollNO, String event, String amountPaid) {
+        String parameters = "uName=" + fullName + "&" + "uEmail=" + emailID + "&" + "uPhone=" + phone + "&" + "uYear=" + year + "&" + "uBranch=" + branch + "&" + "uCollege=" + college + "&" + "uDivision=" + division + "&" + "uRoll=" + rollNO + "&" + "uEvent=" + event + "&" + "uAmount=" + amountPaid;
+        byte[] postData = parameters.getBytes(Charset.forName("UTF-8"));
+        int postDataLength = postData.length;
+        HttpURLConnection conn = null;
+
+        sharedPreferences = context.getSharedPreferences("TML", Context.MODE_PRIVATE);
+        editor = sharedPreferences.edit();
+        try {
+            URL url = new URL(regLink);
+            conn = (HttpURLConnection) url.openConnection();
+            conn.setReadTimeout(10000);
+            conn.setConnectTimeout(15000);
+            conn.setRequestMethod("POST");
+            conn.setDoInput(true);
+            conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            conn.setRequestProperty("charset", "utf-8");
+            conn.setRequestProperty("Content-Length", Integer.toString(postDataLength));
+            conn.connect();
+            OutputStreamWriter writer = new OutputStreamWriter(conn.getOutputStream());
+            writer.write(parameters);
+            writer.flush();
+            writer.close();
+            Log.d("TML", "response " + convertStreamToString(conn.getInputStream()));
+            //editor.putString("reg_status", convertStreamToString(conn.getInputStream()));
+            //editor.apply();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (conn != null)
+                conn.disconnect();
+        }
     }
 
     // Reads an InputStream and converts it to a String.
@@ -59,7 +108,7 @@ public class OnlineDBDownloader {
         } finally {
             try {
                 if (is != null)
-                is.close();
+                    is.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }

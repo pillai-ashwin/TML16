@@ -5,6 +5,8 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -28,6 +30,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import org.json.JSONArray;
 
@@ -107,7 +110,22 @@ public class HomeActivity extends AppCompatActivity
             //Set G+ Profile pic
             mProfilepic = (ImageView) header.findViewById(R.id.profile_pic);
             if (!sharedPreferences.getString("profile_pic", "").equals("")) {
-                Picasso.with(this).load(sharedPreferences.getString("profile_pic", "")).into(mProfilepic);
+                Picasso.with(this).load(sharedPreferences.getString("profile_pic", "")).into(new Target() {
+                    @Override
+                    public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                        mProfilepic.setImageBitmap(bitmap);
+                    }
+
+                    @Override
+                    public void onBitmapFailed(Drawable errorDrawable) {
+
+                    }
+
+                    @Override
+                    public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+                    }
+                });
             } else {
                 mProfilepic.setImageResource(R.mipmap.ic_launcher);
             }
@@ -307,7 +325,7 @@ public class HomeActivity extends AppCompatActivity
 
         @Override
         protected JSONArray doInBackground(Void... params) {
-            OnlineDBDownloader downloader = new OnlineDBDownloader();
+            OnlineDBDownloader downloader = new OnlineDBDownloader(HomeActivity.this);
             downloader.downloadData();
             array = downloader.getJSON();
             return array;

@@ -32,7 +32,7 @@ public class LocalDBHandler extends SQLiteOpenHelper {
     final String E_TIME = "eTime";
     final String E_VENUE = "eVenue";
     final String E_CATEGORY = "eCategory";
-    final String E_DETAIL = "eDetail";
+    final String E_DETAIL = "eDetails";
     final String EVENT_HEAD_1 = "eHead1";
     final String EVENT_HEAD_2 = "eHead2";
     final String E_PHONE_1 = "ePhone1";
@@ -65,7 +65,7 @@ public class LocalDBHandler extends SQLiteOpenHelper {
             "eTime VARCHAR DEFAULT NULL," +
             "eVenue VARCHAR DEFAULT NULL," +
             "eCategory VARCHAR DEFAULT NULL," +
-            "eDetail VARCHAR DEFAULT NULL" +
+            "eDetails VARCHAR DEFAULT NULL," +
             "eHead1 VARCHAR DEFAULT NULL," +
             "ePhone1 VARCHAR DEFAULT NULL," +
             "eHead2 VARCHAR DEFAULT NULL," +
@@ -168,6 +168,19 @@ public class LocalDBHandler extends SQLiteOpenHelper {
     public ArrayList<String> getEventNames(String category) {
         SQLiteDatabase db=getReadableDatabase();
         Cursor cursor = db.query(EVENT_TABLE_NAME, new String[] {E_NAME}, E_CATEGORY + "='" + category + "'", null, null, null, null, null);
+        ArrayList<String> arrayList = new ArrayList<>();
+        for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+            arrayList.add(cursor.getString(cursor.getColumnIndex(E_NAME)));
+        }
+        cursor.close();
+        db.close();
+
+        return arrayList;
+    }
+
+    public ArrayList<String> getAllEventNames() {
+        SQLiteDatabase db=getReadableDatabase();
+        Cursor cursor = db.query(EVENT_TABLE_NAME, new String[] {E_NAME}, null, null, null, null, null, null);
         ArrayList<String> arrayList = new ArrayList<>();
         for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
             arrayList.add(cursor.getString(cursor.getColumnIndex(E_NAME)));

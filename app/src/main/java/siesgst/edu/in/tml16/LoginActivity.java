@@ -1,5 +1,6 @@
 package siesgst.edu.in.tml16;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -26,6 +27,8 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     private AppCompatButton mGooleplus;
     private AppCompatButton mSkip;
     private GoogleApiClient mGoogleApiClient;
+
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +76,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     }
 
     private void signIn() {
+        progressDialog = ProgressDialog.show(this, "", "Loading...");
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
         startActivityForResult(signInIntent, 0);
     }
@@ -108,6 +112,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                 i.putExtra("profile_pic", "");
             }
             setResult(RESULT_OK, i);
+            progressDialog.dismiss();
             finish();
         } else {
             Toast.makeText(LoginActivity.this, "Error Signing in.\nPlease check your internet connection or try again.", Toast.LENGTH_SHORT).show();
