@@ -98,13 +98,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <EditText
+                <AutoCompleteTextView
                     android:id="@+id/college"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="30dp"
-                    android:hint="College"
-                    android:inputType="textCapCharacters" />
+                    android:hint="College" />
 
             </android.support.design.widget.TextInputLayout>
 
@@ -148,8 +147,7 @@
                 android:id="@+id/spinner_event"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
-                android:layout_marginTop="10dp"
-                android:entries="@array/events" />
+                android:layout_marginTop="10dp" />
 
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"

@@ -151,17 +151,24 @@ public class HomeActivity extends AppCompatActivity
                 mEmail.setText(sharedPreferences.getString("email", ""));
             }
 
-            new Handler().postDelayed(new Runnable() {
+            new EventListDownload().execute();
+
+            /*new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
                     checkDatabaseIntegrity();
                 }
-            }, 2000);
+            }, 2000);*/
 
+                if (getIntent().getBooleanExtra("reg_click", false)) {
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.root_frame, new RegistrationFragment())
+                            .commit();
+                }
         }
     }
 
-    public void checkDatabaseIntegrity() {
+    /*public void checkDatabaseIntegrity() {
 
         int currentDBVersion = sharedPreferences.getInt(dbVersion, 0);
         if ((new LocalDBHandler(this)).getDBVersion() > currentDBVersion) {
@@ -187,7 +194,7 @@ public class HomeActivity extends AppCompatActivity
         });
         alertDialog.create();
         alertDialog.show();
-    }
+    }*/
 
     @Override
     public void onBackPressed() {
@@ -236,47 +243,47 @@ public class HomeActivity extends AppCompatActivity
         int id = item.getItemId();
 
         switch (id) {
-            case R.id.sign_in :
+            case R.id.sign_in:
                 startActivityForResult(new Intent(HomeActivity.this, LoginActivity.class), 0);
                 break;
-            case R.id.sign_out :
+            case R.id.sign_out:
                 signOut();
                 break;
-            case R.id.profile :
+            case R.id.profile:
                 startActivity(new Intent(HomeActivity.this, ProfileActivity.class));
                 break;
-            case R.id.tatva :
+            case R.id.tatva:
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.root_frame, new TatvaEventsFragment())
                         .commit();
                 break;
-            case R.id.moksh :
+            case R.id.moksh:
                 break;
-            case R.id.lakshya :
+            case R.id.lakshya:
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.root_frame, new LakshyaEventsFragment())
                         .commit();
                 break;
 
-            case R.id.news :
+            case R.id.news:
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.root_frame, new NewsFragment())
                         .commit();
                 break;
 
-            case R.id.venue :
+            case R.id.venue:
                 break;
 
-            case R.id.register :
+            case R.id.register:
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.root_frame, new RegistrationFragment())
                         .commit();
                 break;
 
-            }
+        }
 
-            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-            drawer.closeDrawer(GravityCompat.START);
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
         return true;
     }
 
@@ -334,10 +341,10 @@ public class HomeActivity extends AppCompatActivity
         @Override
         protected void onPostExecute(JSONArray jsonArray) {
             new DataHandler(HomeActivity.this).decodeAndPushJSON(jsonArray);
-            SharedPreferences.Editor editor=sharedPreferences.edit();
+            SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putInt(dbVersion, new LocalDBHandler(getApplicationContext()).getDBVersion());
             editor.apply();
-            progressDialog.dismiss();
+           // progressDialog.dismiss();
 
         }
     }

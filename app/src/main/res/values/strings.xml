@@ -25,7 +25,7 @@
         <item>CIVIL</item>
         <item>AUTOMOBILE</item>
     </string-array>
-    <string-array name="events">
+    <!--<string-array name="events">
         <item>Big Boss 2</item>
         <item>Moksh Film Festival</item>
         <item>Standup Comedy</item>
@@ -66,5 +66,6 @@
         <item>Robo Soccer</item>
         <item>Legends of the hidden temple</item>
         <item>Virtual Reality games</item>
-    </string-array>
+    </string-array>-->
+    <string name="title_activity_event_details">EventDetailsActivity</string>
 </resources>

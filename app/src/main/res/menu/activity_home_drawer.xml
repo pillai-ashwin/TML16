@@ -5,6 +5,7 @@
         android:checkableBehavior="single">
         <item
             android:id="@+id/news"
+            android:icon="@drawable/ic_news"
             android:title="News" />
     </group>
 
@@ -12,21 +13,26 @@
         <menu>
             <item
                 android:id="@+id/tatva"
+                android:icon="@drawable/ic_tatva"
                 android:title="Tatva" />
             <item
                 android:id="@+id/moksh"
+                android:icon="@drawable/ic_moksh"
                 android:title="Moksh" />
             <item
                 android:id="@+id/lakshya"
+                android:icon="@drawable/ic_lakshya"
                 android:title="Lakshya" />
         </menu>
     </item>
     <group android:id="@+id/group2">
         <item
             android:id="@+id/venue"
+            android:icon="@drawable/ic_venue"
             android:title="Venue" />
         <item
             android:id="@+id/register"
+            android:icon="@drawable/ic_register"
             android:title="Register"/>
         <item
             android:id="@+id/profile"
@@ -34,9 +40,11 @@
             android:title="Profile" />
         <item
             android:id="@+id/sign_out"
+            android:icon="@drawable/ic_signout"
             android:title="Sign Out" />
         <item
             android:id="@+id/sign_in"
+            android:icon="@drawable/ic_signin"
             android:title="Sign In" />
     </group>
 </menu>

@@ -191,6 +191,25 @@ public class LocalDBHandler extends SQLiteOpenHelper {
         return arrayList;
     }
 
+    public ArrayList<String> getEventKaSabKuch(String eventName) {
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.query(EVENT_TABLE_NAME, new String[] {E_DETAIL, E_DAY, E_VENUE, EVENT_HEAD_1, EVENT_HEAD_2, E_PHONE_1, E_PHONE_2}, E_NAME +"='" + eventName + "'", null, null, null, null);
+        ArrayList<String> arrayList = new ArrayList<>();
+        for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+            arrayList.add(cursor.getString(cursor.getColumnIndex(E_DETAIL)));
+            arrayList.add(cursor.getString(cursor.getColumnIndex(E_DAY)));
+            arrayList.add(cursor.getString(cursor.getColumnIndex(E_VENUE)));
+            arrayList.add(cursor.getString(cursor.getColumnIndex(EVENT_HEAD_1)));
+            arrayList.add(cursor.getString(cursor.getColumnIndex(EVENT_HEAD_2)));
+            arrayList.add(cursor.getString(cursor.getColumnIndex(E_PHONE_1)));
+            arrayList.add(cursor.getString(cursor.getColumnIndex(E_PHONE_2)));
+        }
+        cursor.close();
+        db.close();
+
+        return arrayList;
+    }
+
     public int getDBVersion() {
         return DB_VERSION;
     }

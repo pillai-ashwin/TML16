@@ -43,6 +43,12 @@
             android:name="com.facebook.FacebookContentProvider"
             android:authorities="com.facebook.app.FacebookContentProvider1673241409613401"
             android:exported="true" />
+
+        <activity
+            android:name=".EventDetailsActivity"
+            android:label="@string/title_activity_event_details"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:parentActivityName=".HomeActivity"/>
     </application>
 
 </manifest>

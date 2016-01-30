@@ -15,6 +15,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
+import java.net.SocketException;
 import java.net.URL;
 import java.nio.charset.Charset;
 
@@ -80,13 +81,19 @@ public class OnlineDBDownloader {
             conn.connect();
             OutputStreamWriter writer = new OutputStreamWriter(conn.getOutputStream());
             writer.write(parameters);
+            editor.remove("reg_status");
+            editor.putString("reg_status", convertStreamToString(conn.getInputStream()));
+            editor.apply();
             writer.flush();
             writer.close();
-            Log.d("TML", "response " + convertStreamToString(conn.getInputStream()));
-            //editor.putString("reg_status", convertStreamToString(conn.getInputStream()));
-            //editor.apply();
+        } catch (SocketException e) {
+            editor.remove("reg_status");
+            editor.putString("reg_status", "Unable to connect fetch data; Try again...");
+            editor.apply();
         } catch (IOException e) {
-            e.printStackTrace();
+            editor.remove("reg_status");
+            editor.putString("reg_status", "Some error occurred; Try again... ");
+            editor.apply();
         } finally {
             if (conn != null)
                 conn.disconnect();
