@@ -1,13 +1,14 @@
 package siesgst.edu.in.tml16.fragments;
 
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.AppCompatButton;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +19,13 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.mobsandgeeks.saripaar.Rule;
+import com.mobsandgeeks.saripaar.Validator;
+import com.mobsandgeeks.saripaar.annotation.Email;
+import com.mobsandgeeks.saripaar.annotation.Regex;
+import com.mobsandgeeks.saripaar.annotation.Required;
+import com.mobsandgeeks.saripaar.annotation.TextRule;
+
 import siesgst.edu.in.tml16.R;
 import siesgst.edu.in.tml16.utils.ConnectionUtils;
 import siesgst.edu.in.tml16.utils.LocalDBHandler;
@@ -26,17 +34,33 @@ import siesgst.edu.in.tml16.utils.OnlineDBDownloader;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class RegistrationFragment extends Fragment {
+public class RegistrationFragment extends Fragment implements Validator.ValidationListener {
 
     OnlineDBDownloader db;
-    EditText fullName, emailID, phone, division, rollNO, amountPaid;
+    @Required(order = 1)
+    EditText fullName;
+    @Required(order = 2)
+    @Email(order = 3, message = "Enter valid email address")
+    EditText emailID;
+    @Required(order = 4)
+    @Regex(order = 5, pattern = "[0-9]+", message = "Phone number should contain only digits")
+    @TextRule(order = 6, minLength = 10, maxLength = 10, message = "Please enter a 10 digit number")
+    EditText phone;
+    EditText division;
+    @Required(order = 7)
+    @Regex(order = 8, pattern = "[0-9A-Za-z]+", message = "Phone number should contain only alphanumeric characters")
+    EditText rollNO;
 
+    @Required(order = 9)
     AutoCompleteTextView college;
 
     String year, branch, event = "";
 
     SharedPreferences sharedPreferences;
 
+    ProgressDialog progressDialog;
+
+    Validator validator;
     public RegistrationFragment() {
         // Required empty public constructor
     }
@@ -50,16 +74,19 @@ public class RegistrationFragment extends Fragment {
 
         db = new OnlineDBDownloader(getActivity());
 
+        validator = new Validator(this);
+        validator.setValidationListener(this);
+
         fullName = (EditText) view.findViewById(R.id.full_name);
         emailID = (EditText) view.findViewById(R.id.email_id);
         phone = (EditText) view.findViewById(R.id.phone_no);
         division = (EditText) view.findViewById(R.id.div);
         rollNO = (EditText) view.findViewById(R.id.roll_no);
-        amountPaid = (EditText) view.findViewById(R.id.amount);
 
         sharedPreferences = getActivity().getSharedPreferences("TML", Context.MODE_PRIVATE);
 
         college = (AutoCompleteTextView) view.findViewById(R.id.college);
+        college.setText("SIES Graduate School of Technology");
 
 
         Spinner spinnerYear = (Spinner) view.findViewById(R.id.spinner_year);
@@ -107,32 +134,54 @@ public class RegistrationFragment extends Fragment {
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
+                validator.validate();
+            }
+        });
+        return view;
+    }
+
+    public void onValidationFailed(View failedView, Rule<?> failedRule) {
+        String message = failedRule.getFailureMessage();
+
+        if (failedView instanceof EditText) {
+            failedView.requestFocus();
+            ((EditText) failedView).setError(message);
+        } else {
+            Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void onValidationSucceeded() {
+        progressDialog = ProgressDialog.show(getActivity(), "Registering", "Please wait...");
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
                 new Thread() {
                     @Override
                     public void run() {
                         if ((new ConnectionUtils(getActivity()).checkConnection())) {
-                            db.submitRegData(fullName.getText().toString(), emailID.getText().toString(), phone.getText().toString(), year, branch, college.getText().toString(), division.getText().toString(), rollNO.getText().toString(), event, amountPaid.getText().toString());
+                            db.submitRegData(fullName.getText().toString(), emailID.getText().toString(), phone.getText().toString(), year, branch, college.getText().toString(), division.getText().toString(), rollNO.getText().toString(), event);
                             getActivity().runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    //Toast.makeText(getActivity(), sharedPreferences.getString("reg_status", ""), Toast.LENGTH_SHORT).show();
-                                    Snackbar.make(v, sharedPreferences.getString("reg_status", ""), Snackbar.LENGTH_SHORT).show();
+                                    Toast.makeText(getActivity(), sharedPreferences.getString("reg_status", ""), Toast.LENGTH_LONG).show();
+                                    //Snackbar.make(v, sharedPreferences.getString("reg_status", ""), Snackbar.LENGTH_SHORT).show();
                                 }
                             });
                         } else {
                             getActivity().runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    //Toast.makeText(getActivity(), "Please check your internet connection..", Toast.LENGTH_SHORT).show();
-                                    Snackbar.make(v, "Please check your internet connection..", Snackbar.LENGTH_SHORT).show();
+                                    Toast.makeText(getActivity(), "Please check your internet connection..", Toast.LENGTH_SHORT).show();
+                                    //Snackbar.make(v, "Please check your internet connection..", Snackbar.LENGTH_LONG).show();
                                 }
                             });
                         }
                     }
                 }.start();
-
+                progressDialog.dismiss();
             }
-        });
-        return view;
+        }, 4000);
     }
 }

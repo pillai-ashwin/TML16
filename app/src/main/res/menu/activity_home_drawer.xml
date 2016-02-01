@@ -36,7 +36,6 @@
             android:title="Register"/>
         <item
             android:id="@+id/profile"
-            android:icon="@drawable/ic_face_black"
             android:title="Profile" />
         <item
             android:id="@+id/sign_out"

@@ -26,7 +26,7 @@ public class OnlineDBDownloader {
 
     private JSONArray JSON;
     final String link = "http://tml.siesgst.ac.in/includes/resources.php";
-    final String regLink = "http://tml.siesgst.ac.in/validate/index.php";
+    final String regLink = "http://tml.siesgst.ac.in/validate/validate.php";
 
     Context context;
 
@@ -60,8 +60,8 @@ public class OnlineDBDownloader {
 
     }
 
-    public void submitRegData(String fullName, String emailID, String phone, String year, String branch, String college, String division, String rollNO, String event, String amountPaid) {
-        String parameters = "uName=" + fullName + "&" + "uEmail=" + emailID + "&" + "uPhone=" + phone + "&" + "uYear=" + year + "&" + "uBranch=" + branch + "&" + "uCollege=" + college + "&" + "uDivision=" + division + "&" + "uRoll=" + rollNO + "&" + "uEvent=" + event + "&" + "uAmount=" + amountPaid;
+    public void submitRegData(String fullName, String emailID, String phone, String year, String branch, String college, String division, String rollNO, String event) {
+        String parameters = "uName=" + fullName + "&" + "uEmail=" + emailID + "&" + "uPhone=" + phone + "&" + "uYear=" + year + "&" + "uBranch=" + branch + "&" + "uCollege=" + college + "&" + "uDivision=" + division + "&" + "uRoll=" + rollNO + "&" + "uEvent=" + event;
         byte[] postData = parameters.getBytes(Charset.forName("UTF-8"));
         int postDataLength = postData.length;
         HttpURLConnection conn = null;
@@ -81,16 +81,17 @@ public class OnlineDBDownloader {
             conn.connect();
             OutputStreamWriter writer = new OutputStreamWriter(conn.getOutputStream());
             writer.write(parameters);
+            writer.flush();
             editor.remove("reg_status");
             editor.putString("reg_status", convertStreamToString(conn.getInputStream()));
             editor.apply();
-            writer.flush();
             writer.close();
         } catch (SocketException e) {
             editor.remove("reg_status");
             editor.putString("reg_status", "Unable to connect fetch data; Try again...");
             editor.apply();
         } catch (IOException e) {
+            e.printStackTrace();
             editor.remove("reg_status");
             editor.putString("reg_status", "Some error occurred; Try again... ");
             editor.apply();

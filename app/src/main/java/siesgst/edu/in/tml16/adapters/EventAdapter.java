@@ -22,13 +22,14 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
     List<FeedEvents> feedEventsList;
     Context context;
 
-    public EventAdapter(Context context, String category) {
+    public EventAdapter(Context context, String category, String subCategory) {
         this.context = context;
         feedEventsList = new ArrayList<>();
 
-        for (int i = 0; i < ((new LocalDBHandler(context)).getEventNames(category)).size(); i++) {
+        for (int i = 0; i < ((new LocalDBHandler(context)).getEventNamesAndDay(category, subCategory)).size() - 1; i = i +2) {
             FeedEvents feedEvents = new FeedEvents();
-            feedEvents.setEventName((new LocalDBHandler(context)).getEventNames(category).get(i) );
+            feedEvents.setEventName((new LocalDBHandler(context)).getEventNamesAndDay(category, subCategory).get(i) );
+            feedEvents.setEventDay((new LocalDBHandler(context)).getEventNamesAndDay(category, subCategory).get(i + 1));
             feedEventsList.add(feedEvents);
         }
     }
@@ -47,6 +48,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
         FeedEvents feedEvents = feedEventsList.get(i);
 
         viewHolder.eventName.setText(feedEvents.getEventName());
+        viewHolder.eventDay.setText(feedEvents.getEventDay());
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
@@ -54,13 +56,13 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
         protected ImageView eventIcon;
         protected TextView eventName;
         protected TextView eventDay;
-        protected TextView eventDate;
 
         public ViewHolder(View itemView) {
             super(itemView);
 
             eventIcon = (ImageView) itemView.findViewById(R.id.event_icon);
             eventName = (TextView) itemView.findViewById(R.id.event_name);
+            eventDay = (TextView) itemView.findViewById(R.id.event_day);
         }
     }
 

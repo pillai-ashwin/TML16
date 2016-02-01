@@ -35,6 +35,7 @@ import com.squareup.picasso.Target;
 import org.json.JSONArray;
 
 import siesgst.edu.in.tml16.fragments.LakshyaEventsFragment;
+import siesgst.edu.in.tml16.fragments.MokshTabFragment;
 import siesgst.edu.in.tml16.fragments.NewsFragment;
 import siesgst.edu.in.tml16.fragments.RegistrationFragment;
 import siesgst.edu.in.tml16.fragments.TatvaEventsFragment;
@@ -151,7 +152,10 @@ public class HomeActivity extends AppCompatActivity
                 mEmail.setText(sharedPreferences.getString("email", ""));
             }
 
-            new EventListDownload().execute();
+            if ((new ConnectionUtils(this).checkConnection())) {
+                new LocalDBHandler(this).wapasTableBana();
+                new EventListDownload().execute();
+            }
 
             /*new Handler().postDelayed(new Runnable() {
                 @Override
@@ -160,11 +164,11 @@ public class HomeActivity extends AppCompatActivity
                 }
             }, 2000);*/
 
-                if (getIntent().getBooleanExtra("reg_click", false)) {
-                    getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.root_frame, new RegistrationFragment())
-                            .commit();
-                }
+            if (getIntent().getBooleanExtra("reg_click", false)) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.root_frame, new RegistrationFragment())
+                        .commit();
+            }
         }
     }
 
@@ -244,42 +248,83 @@ public class HomeActivity extends AppCompatActivity
 
         switch (id) {
             case R.id.sign_in:
-                startActivityForResult(new Intent(HomeActivity.this, LoginActivity.class), 0);
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        startActivityForResult(new Intent(HomeActivity.this, LoginActivity.class), 0);
+                    }
+                }, 300);
                 break;
             case R.id.sign_out:
-                signOut();
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        signOut();
+                    }
+                }, 300);
+
                 break;
             case R.id.profile:
-                startActivity(new Intent(HomeActivity.this, ProfileActivity.class));
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        startActivity(new Intent(HomeActivity.this, ProfileActivity.class));
+                    }
+                }, 300);
                 break;
             case R.id.tatva:
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.root_frame, new TatvaEventsFragment())
-                        .commit();
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.root_frame, new TatvaEventsFragment())
+                                .commit();
+                    }
+                }, 300);
                 break;
             case R.id.moksh:
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.root_frame, new MokshTabFragment())
+                                .commit();
+                    }
+                }, 300);
                 break;
             case R.id.lakshya:
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.root_frame, new LakshyaEventsFragment())
-                        .commit();
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.root_frame, new LakshyaEventsFragment())
+                                .commit();
+                    }
+                }, 300);
                 break;
-
             case R.id.news:
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.root_frame, new NewsFragment())
-                        .commit();
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.root_frame, new NewsFragment())
+                                .commit();
+                    }
+                }, 300);
                 break;
-
             case R.id.venue:
                 break;
 
             case R.id.register:
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.root_frame, new RegistrationFragment())
-                        .commit();
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.root_frame, new RegistrationFragment())
+                                .commit();
+                    }
+                }, 300);
                 break;
-
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -305,12 +350,12 @@ public class HomeActivity extends AppCompatActivity
                     public void onResult(Status status) {
                         if (status.isSuccess()) {
                             Toast.makeText(HomeActivity.this, "Signed out...", Toast.LENGTH_SHORT).show();
-                            new Thread() {
+                            new Handler().postDelayed(new Runnable() {
                                 @Override
                                 public void run() {
                                     startActivityForResult(new Intent(HomeActivity.this, LoginActivity.class), 0);
                                 }
-                            }.start();
+                            }, 200);
                             editor.remove("login_status");
                             editor.remove("username");
                             editor.remove("email");
@@ -344,7 +389,7 @@ public class HomeActivity extends AppCompatActivity
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putInt(dbVersion, new LocalDBHandler(getApplicationContext()).getDBVersion());
             editor.apply();
-           // progressDialog.dismiss();
+            // progressDialog.dismiss();
 
         }
     }

@@ -39,7 +39,7 @@ public class LakshyaEventsFragment extends Fragment {
         recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        adapter = new EventAdapter(getActivity(), "Lakshya");
+        adapter = new EventAdapter(getActivity(), "Lakshya", null);
         recyclerView.setAdapter(adapter);
 
         ItemClickSupport.addTo(recyclerView).setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {

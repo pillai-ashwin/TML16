@@ -29,9 +29,9 @@ public class LocalDBHandler extends SQLiteOpenHelper {
     final String E_KEY = "eID";
     final String E_NAME = "eName";
     final String E_DAY = "eDay";
-    final String E_TIME = "eTime";
     final String E_VENUE = "eVenue";
     final String E_CATEGORY = "eCategory";
+    final String E_SUBCATEGORY = "eSubCategory";
     final String E_DETAIL = "eDetails";
     final String EVENT_HEAD_1 = "eHead1";
     final String EVENT_HEAD_2 = "eHead2";
@@ -62,9 +62,9 @@ public class LocalDBHandler extends SQLiteOpenHelper {
     final String CREATE_EVENT_TABLE = "CREATE TABLE IF NOT EXISTS event_table(eID INTEGER PRIMARY KEY AUTOINCREMENT," +
             "eName VARCHAR DEFAULT NULL," +
             "eDay VARCHAR DEFAULT NULL," +
-            "eTime VARCHAR DEFAULT NULL," +
             "eVenue VARCHAR DEFAULT NULL," +
             "eCategory VARCHAR DEFAULT NULL," +
+            "eSubCategory VARCHAR DEFAULT NULL," +
             "eDetails VARCHAR DEFAULT NULL," +
             "eHead1 VARCHAR DEFAULT NULL," +
             "ePhone1 VARCHAR DEFAULT NULL," +
@@ -141,9 +141,9 @@ public class LocalDBHandler extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(E_NAME, data[0]);
         values.put(E_DAY, data[1]);
-        values.put(E_TIME, data[2]);
-        values.put(E_VENUE, data[3]);
-        values.put(E_CATEGORY, data[4]);
+        values.put(E_VENUE, data[2]);
+        values.put(E_CATEGORY, data[3]);
+        values.put(E_SUBCATEGORY, data[4]);
         values.put(E_DETAIL, data[5]);
         values.put(EVENT_HEAD_1, data[6]);
         values.put(E_PHONE_1, data[7]);
@@ -165,12 +165,18 @@ public class LocalDBHandler extends SQLiteOpenHelper {
         db.close();
     }
 
-    public ArrayList<String> getEventNames(String category) {
+    public ArrayList<String> getEventNamesAndDay(String category, String subCategory) {
         SQLiteDatabase db=getReadableDatabase();
-        Cursor cursor = db.query(EVENT_TABLE_NAME, new String[] {E_NAME}, E_CATEGORY + "='" + category + "'", null, null, null, null, null);
+        Cursor cursor;
+        if (subCategory != null) {
+            cursor = db.query(EVENT_TABLE_NAME, new String[]{E_NAME, E_DAY}, E_CATEGORY + "='" + category + "' and " + E_SUBCATEGORY + "='" + subCategory + "'", null, null, null, null, null);
+        } else {
+            cursor = db.query(EVENT_TABLE_NAME, new String[]{E_NAME, E_DAY}, E_CATEGORY + "='" + category + "'", null, null, null, null, null);
+        }
         ArrayList<String> arrayList = new ArrayList<>();
         for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
             arrayList.add(cursor.getString(cursor.getColumnIndex(E_NAME)));
+            arrayList.add(cursor.getString(cursor.getColumnIndex(E_DAY)));
         }
         cursor.close();
         db.close();
@@ -209,6 +215,26 @@ public class LocalDBHandler extends SQLiteOpenHelper {
 
         return arrayList;
     }
+
+    /*public ArrayList<String> getSubCategoryDetails(String subCategory) {
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.query(EVENT_TABLE_NAME, new String[]{E_NAME, E_DETAIL, E_DAY, E_VENUE, EVENT_HEAD_1, EVENT_HEAD_2, E_PHONE_1, E_PHONE_2}, E_SUBCATEGORY + "='" + subCategory + "'", null, null, null, null);
+        ArrayList<String> arrayList = new ArrayList<>();
+        for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+            arrayList.add(cursor.getString(cursor.getColumnIndex(E_NAME)));
+            arrayList.add(cursor.getString(cursor.getColumnIndex(E_DETAIL)));
+            arrayList.add(cursor.getString(cursor.getColumnIndex(E_DAY)));
+            arrayList.add(cursor.getString(cursor.getColumnIndex(E_VENUE)));
+            arrayList.add(cursor.getString(cursor.getColumnIndex(EVENT_HEAD_1)));
+            arrayList.add(cursor.getString(cursor.getColumnIndex(EVENT_HEAD_2)));
+            arrayList.add(cursor.getString(cursor.getColumnIndex(E_PHONE_1)));
+            arrayList.add(cursor.getString(cursor.getColumnIndex(E_PHONE_2)));
+        }
+        cursor.close();
+        db.close();
+
+        return arrayList;
+    }*/
 
     public int getDBVersion() {
         return DB_VERSION;

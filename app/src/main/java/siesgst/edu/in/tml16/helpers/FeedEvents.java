@@ -7,7 +7,6 @@ public class FeedEvents {
     private String eventName;
     private int eventIcon;
     private String eventDay;
-    private String eventDate;
 
     public void setEventName(String eventName) {
         this.eventName = eventName;
@@ -31,13 +30,5 @@ public class FeedEvents {
 
     public String getEventDay() {
         return eventDay;
-    }
-
-    public void setEventDate(String eventDate) {
-        this.eventDate = eventDate;
-    }
-
-    public String getEventDate() {
-        return eventDate;
     }
 }

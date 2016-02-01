@@ -32,9 +32,9 @@ public class DataHandler {
                 String[] data = new String[12];
                 data[0] = object.getString("eName");
                 data[1] = object.getString("eDay");
-                data[2] = object.getString("eTime");
-                data[3] = object.getString("eVenue");
-                data[4] = object.getString("eCategory");
+                data[2] = object.getString("eVenue");
+                data[3] = object.getString("eCategory");
+                data[4] = object.getString("eSubCategory");
                 data[5] = object.getString("eDetails");
                 data[6] = object.getString("eHead1");
                 data[7] = object.getString("ePhone1");
