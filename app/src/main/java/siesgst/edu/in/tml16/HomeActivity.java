@@ -33,6 +33,7 @@ import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 import siesgst.edu.in.tml16.fragments.LakshyaEventsFragment;
 import siesgst.edu.in.tml16.fragments.MokshTabFragment;
@@ -55,7 +56,6 @@ public class HomeActivity extends AppCompatActivity
     private TextView mEmail;
 
     private Menu menu;
-    private ProgressDialog progressDialog;
 
     private GoogleApiClient mGoogleApiClient;
 
@@ -93,6 +93,7 @@ public class HomeActivity extends AppCompatActivity
         else if (sharedPreferences.getInt("login_status", 0) == 2 | sharedPreferences.getInt("login_status", 0) == 1) {
 
             setContentView(R.layout.activity_home);
+            setUpHomeLayout();
             Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
             setSupportActionBar(toolbar);
 
@@ -111,22 +112,7 @@ public class HomeActivity extends AppCompatActivity
             //Set G+ Profile pic
             mProfilepic = (ImageView) header.findViewById(R.id.profile_pic);
             if (!sharedPreferences.getString("profile_pic", "").equals("")) {
-                Picasso.with(this).load(sharedPreferences.getString("profile_pic", "")).into(new Target() {
-                    @Override
-                    public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                        mProfilepic.setImageBitmap(bitmap);
-                    }
-
-                    @Override
-                    public void onBitmapFailed(Drawable errorDrawable) {
-
-                    }
-
-                    @Override
-                    public void onPrepareLoad(Drawable placeHolderDrawable) {
-
-                    }
-                });
+                Picasso.with(this).load(sharedPreferences.getString("profile_pic", "")).into(mProfilepic);
             } else {
                 mProfilepic.setImageResource(R.mipmap.ic_launcher);
             }
@@ -152,17 +138,14 @@ public class HomeActivity extends AppCompatActivity
                 mEmail.setText(sharedPreferences.getString("email", ""));
             }
 
-            if ((new ConnectionUtils(this).checkConnection())) {
-                new LocalDBHandler(this).wapasTableBana();
-                new EventListDownload().execute();
-            }
-
             /*new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
                     checkDatabaseIntegrity();
                 }
             }, 2000);*/
+
+            //new FBDataDownload().execute();
 
             if (getIntent().getBooleanExtra("reg_click", false)) {
                 getSupportFragmentManager().beginTransaction()
@@ -171,34 +154,6 @@ public class HomeActivity extends AppCompatActivity
             }
         }
     }
-
-    /*public void checkDatabaseIntegrity() {
-
-        int currentDBVersion = sharedPreferences.getInt(dbVersion, 0);
-        if ((new LocalDBHandler(this)).getDBVersion() > currentDBVersion) {
-            progressDialog = ProgressDialog.show(this, "Syncing Data", "Please wait....");
-            if ((new ConnectionUtils(this).checkConnection())) {
-                new LocalDBHandler(this).wapasTableBana();
-                new EventListDownload().execute();
-            } else {
-                progressDialog.dismiss();
-                showError();
-            }
-        }
-    }
-
-    public void showError() {
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
-        alertDialog.setTitle("Please check your internet connection and try again.");
-        alertDialog.setPositiveButton("Try Again", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                checkDatabaseIntegrity();
-            }
-        });
-        alertDialog.create();
-        alertDialog.show();
-    }*/
 
     @Override
     public void onBackPressed() {
@@ -332,6 +287,17 @@ public class HomeActivity extends AppCompatActivity
         return true;
     }
 
+    public void setUpHomeLayout() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.root_frame, new NewsFragment())
+                        .commit();
+            }
+        }, 300);
+    }
+
     private void hideOption(int id) {
         MenuItem item = menu.findItem(id);
         item.setVisible(false);
@@ -390,6 +356,24 @@ public class HomeActivity extends AppCompatActivity
             editor.putInt(dbVersion, new LocalDBHandler(getApplicationContext()).getDBVersion());
             editor.apply();
             // progressDialog.dismiss();
+
+        }
+    }
+
+    private class FBDataDownload extends AsyncTask<Void, Void, JSONObject> {
+        JSONObject object;
+
+        @Override
+        protected JSONObject doInBackground(Void... params) {
+            OnlineDBDownloader downloader = new OnlineDBDownloader(HomeActivity.this);
+            downloader.getFacebookData();
+            object = downloader.getFBObject();
+            return object;
+        }
+
+        @Override
+        protected void onPostExecute(JSONObject object) {
+            new DataHandler(HomeActivity.this).pushFBData(object);
 
         }
     }

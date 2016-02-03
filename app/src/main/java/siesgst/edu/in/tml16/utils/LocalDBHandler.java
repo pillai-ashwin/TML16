@@ -40,6 +40,13 @@ public class LocalDBHandler extends SQLiteOpenHelper {
     final String E_CREATED = "eCreated";
     final String E_MODIFIED = "eModified";
 
+    final String F_MESSAGE = "fMessage";
+    final String F_PICTURE = "fPicture";
+    final String F_LINK = "fLink";
+    final String F_LIKES = "fLikes";
+    final String F_COMMENTS = "fComments";
+    final String F_NEXT = "fNext";
+
     final String PAYMENT_STATUS = "pStatus";
 
     final int DB_VERSION = 1;
@@ -47,6 +54,7 @@ public class LocalDBHandler extends SQLiteOpenHelper {
     final String USER_TABLE_NAME = "user_table";
     final String EVENT_TABLE_NAME = "event_table";
     final String REG_TABLE_NAME = "reg_table";
+    final String FB_DATA_TABLE = "fb_data";
 
     final String CREATE_USER_TABLE  = "CREATE TABLE IF NOT EXISTS user_table(uID INTEGER PRIMARY KEY AUTOINCREMENT," +
             "uName VARCHAR DEFAULT NULL," +
@@ -77,6 +85,15 @@ public class LocalDBHandler extends SQLiteOpenHelper {
             "eID VARCHAR DEFAULT NULL," +
             "pStatus VARCHAR DEFAULT NULL)";
 
+    final String CREATE_FB_DATA_TABLE = "CREATE TABLE IF NOT EXISTS fb_data(fID INTEGER PRIMARY KEY AUTOINCREMENT," +
+            "fMessage VARCHAR DEFAULT NULL," +
+            "fPicture VARCHAR DEFAULT NULL," +
+            "fLink VARCHAR DEFAULT NULL," +
+            "fLikes VARCHAR DEFAULT NULL," +
+            "fComments VARCHAR DEFAULT NULL," +
+            "fNext VARCHAR DEFAULT NULL)";
+
+
 
     public LocalDBHandler(Context context) {
         super(context, "tml_event_details", null, 1);
@@ -87,6 +104,7 @@ public class LocalDBHandler extends SQLiteOpenHelper {
         database.execSQL(CREATE_USER_TABLE);
         database.execSQL(CREATE_EVENT_TABLE);
         database.execSQL(CREATE_REG_TABLE);
+        database.execSQL(CREATE_FB_DATA_TABLE);
     }
 
     @Override
@@ -102,6 +120,7 @@ public class LocalDBHandler extends SQLiteOpenHelper {
         db.execSQL(CREATE_EVENT_TABLE);
         db.execSQL("DROP TABLE IF EXISTS " + REG_TABLE_NAME);
         db.execSQL(CREATE_REG_TABLE);
+        db.execSQL("DROP TABLE IF EXISTS " + FB_DATA_TABLE);
         db.close();
     }
 
@@ -165,6 +184,27 @@ public class LocalDBHandler extends SQLiteOpenHelper {
         db.close();
     }
 
+    public void insertFBData(String[] data) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(F_MESSAGE, data[0]);
+        values.put(F_PICTURE, data[1]);
+        values.put(F_LINK, data[2]);
+        /*values.put(F_LIKES, data[3]);
+        values.put(F_COMMENTS, data[4]);
+        values.put(F_NEXT, data[5]);*/
+        db.insert(FB_DATA_TABLE, null, values);
+        db.close();
+    }
+
+    public void insertNextValue(String value) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(F_NEXT, value);
+        db.insert(FB_DATA_TABLE, null, values);
+        db.close();
+    }
+
     public ArrayList<String> getEventNamesAndDay(String category, String subCategory) {
         SQLiteDatabase db=getReadableDatabase();
         Cursor cursor;
@@ -209,6 +249,21 @@ public class LocalDBHandler extends SQLiteOpenHelper {
             arrayList.add(cursor.getString(cursor.getColumnIndex(EVENT_HEAD_2)));
             arrayList.add(cursor.getString(cursor.getColumnIndex(E_PHONE_1)));
             arrayList.add(cursor.getString(cursor.getColumnIndex(E_PHONE_2)));
+        }
+        cursor.close();
+        db.close();
+
+        return arrayList;
+    }
+
+    public ArrayList<String> getFBData() {
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.query(FB_DATA_TABLE, new String[] {F_MESSAGE, F_PICTURE, F_LINK } , null, null, null, null, null);
+        ArrayList<String> arrayList = new ArrayList<>();
+        for (cursor.moveToFirst(); !cursor.isLast(); cursor.moveToNext()) {
+            arrayList.add(cursor.getString(cursor.getColumnIndex(F_MESSAGE)));
+            arrayList.add(cursor.getString(cursor.getColumnIndex(F_PICTURE)));
+            arrayList.add(cursor.getString(cursor.getColumnIndex(F_LINK)));
         }
         cursor.close();
         db.close();

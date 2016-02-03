@@ -2,8 +2,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="siesgst.edu.in.tml16.fragments.TatvaEventsFragment"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:context="siesgst.edu.in.tml16.fragments.TatvaEventsFragment">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_view"

@@ -1,6 +1,7 @@
 package siesgst.edu.in.tml16.fragments;
 
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -24,6 +25,8 @@ public class EntertainmentFragment extends Fragment {
     private RecyclerView recyclerView;
     private EventAdapter adapter;
 
+    ProgressDialog progressDialog;
+
     public EntertainmentFragment() {
         // Required empty public constructor
     }
@@ -34,6 +37,8 @@ public class EntertainmentFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_entertainment, container, false);
+
+        progressDialog = ProgressDialog.show(getActivity(), "", "Loading...");
 
         recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -50,6 +55,8 @@ public class EntertainmentFragment extends Fragment {
                 startActivity(intent);
             }
         });
+
+        progressDialog.dismiss();
 
         return view;
     }

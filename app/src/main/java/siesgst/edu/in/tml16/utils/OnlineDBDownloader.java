@@ -27,7 +27,9 @@ public class OnlineDBDownloader {
     private JSONArray JSON;
     final String link = "http://tml.siesgst.ac.in/includes/resources.php";
     final String regLink = "http://tml.siesgst.ac.in/validate/validate.php";
+    final String fbLink = "https://graph.facebook.com/siesgst.TML/feed?fields=message,full_picture,likes,comments,link&&access_token=CAAXxzdZCX7lkBAGdnbDswtUqpEhCqEpQCOGsVwXBUI8WZBaGuc1hzKSvg7uuhjGfMkIiwpqAQoHSB9o7PyltY0PUXYusH5JV0Wsz9psIY19UV6tY6bUZCOHwtoGZAUWnMpq1Qwx3QAJO4kCs1YH6lijNFIgNemz71bxBiXse8sDQLnLXatIT0fegQt6fqYhpsuzeI2CJwgZDZD";
 
+    private JSONObject fbObject;
     Context context;
 
     SharedPreferences sharedPreferences;
@@ -71,8 +73,8 @@ public class OnlineDBDownloader {
         try {
             URL url = new URL(regLink);
             conn = (HttpURLConnection) url.openConnection();
-            conn.setReadTimeout(10000);
-            conn.setConnectTimeout(15000);
+            conn.setReadTimeout(10000000);
+            conn.setConnectTimeout(15000000);
             conn.setRequestMethod("POST");
             conn.setDoInput(true);
             conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
@@ -95,6 +97,26 @@ public class OnlineDBDownloader {
             editor.remove("reg_status");
             editor.putString("reg_status", "Some error occurred; Try again... ");
             editor.apply();
+        } finally {
+            if (conn != null)
+                conn.disconnect();
+        }
+    }
+
+    public void getFacebookData() {
+        HttpURLConnection conn = null;
+        try {
+            URL url = new URL(fbLink);
+            conn = (HttpURLConnection) url.openConnection();
+            conn.setReadTimeout(100000);
+            conn.setConnectTimeout(150000);
+            conn.setRequestMethod("GET");
+            conn.connect();
+            fbObject = new JSONObject(convertStreamToString(conn.getInputStream()));
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
         } finally {
             if (conn != null)
                 conn.disconnect();
@@ -126,5 +148,9 @@ public class OnlineDBDownloader {
 
     public JSONArray getJSON() {
         return JSON;
+    }
+
+    public JSONObject getFBObject() {
+        return fbObject;
     }
 }

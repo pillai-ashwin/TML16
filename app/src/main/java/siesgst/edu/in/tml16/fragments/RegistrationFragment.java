@@ -166,6 +166,7 @@ public class RegistrationFragment extends Fragment implements Validator.Validati
                                 @Override
                                 public void run() {
                                     Toast.makeText(getActivity(), sharedPreferences.getString("reg_status", ""), Toast.LENGTH_LONG).show();
+                                    progressDialog.dismiss();
                                     //Snackbar.make(v, sharedPreferences.getString("reg_status", ""), Snackbar.LENGTH_SHORT).show();
                                 }
                             });
@@ -174,13 +175,13 @@ public class RegistrationFragment extends Fragment implements Validator.Validati
                                 @Override
                                 public void run() {
                                     Toast.makeText(getActivity(), "Please check your internet connection..", Toast.LENGTH_SHORT).show();
+                                    progressDialog.dismiss();
                                     //Snackbar.make(v, "Please check your internet connection..", Snackbar.LENGTH_LONG).show();
                                 }
                             });
                         }
                     }
                 }.start();
-                progressDialog.dismiss();
             }
         }, 4000);
     }

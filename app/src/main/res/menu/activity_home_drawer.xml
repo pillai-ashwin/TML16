@@ -5,7 +5,7 @@
         android:checkableBehavior="single">
         <item
             android:id="@+id/news"
-            android:icon="@drawable/ic_news"
+            android:icon="@mipmap/ic_import_contacts_black_24dp"
             android:title="News" />
     </group>
 
@@ -13,37 +13,38 @@
         <menu>
             <item
                 android:id="@+id/tatva"
-                android:icon="@drawable/ic_tatva"
+                android:icon="@mipmap/ic_build_black_24dp"
                 android:title="Tatva" />
             <item
                 android:id="@+id/moksh"
-                android:icon="@drawable/ic_moksh"
+                android:icon="@mipmap/ic_stars_black_24dp"
                 android:title="Moksh" />
             <item
                 android:id="@+id/lakshya"
-                android:icon="@drawable/ic_lakshya"
+                android:icon="@mipmap/ic_timer_black_24dp"
                 android:title="Lakshya" />
         </menu>
     </item>
     <group android:id="@+id/group2">
         <item
             android:id="@+id/venue"
-            android:icon="@drawable/ic_venue"
+            android:icon="@mipmap/ic_place_black_24dp"
             android:title="Venue" />
         <item
             android:id="@+id/register"
-            android:icon="@drawable/ic_register"
+            android:icon="@mipmap/ic_content_paste_black_24dp"
             android:title="Register"/>
         <item
             android:id="@+id/profile"
+            android:icon="@mipmap/ic_face_black_24dp"
             android:title="Profile" />
         <item
             android:id="@+id/sign_out"
-            android:icon="@drawable/ic_signout"
+            android:icon="@mipmap/ic_arrow_back_black_24dp"
             android:title="Sign Out" />
         <item
             android:id="@+id/sign_in"
-            android:icon="@drawable/ic_signin"
+            android:icon="@mipmap/ic_arrow_forward_black_24dp"
             android:title="Sign In" />
     </group>
 </menu>

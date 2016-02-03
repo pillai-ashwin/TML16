@@ -1,6 +1,7 @@
 package siesgst.edu.in.tml16.utils;
 
 import android.content.Context;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -48,6 +49,48 @@ public class DataHandler {
 
         } catch (JSONException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void pushFBData(JSONObject object) {
+        JSONArray array;
+        JSONObject fbObject;
+        try {
+            array = object.getJSONArray("data");
+            for (int i = 0; i < array.length(); i++) {
+                fbObject = array.getJSONObject(i);
+                String [] data = new String[5];
+                data[0] = fbObject.getString("message");
+                data[1] = fbObject.getString("full_picture");
+                data[2] = fbObject.getString("link");
+                /*JSONObject likeObject = fbObject.getJSONObject("likes");
+                JSONArray likeArray = likeObject.getJSONArray("data");
+                data[3] = String.valueOf(likeArray.length());
+                if (getCommentObject(fbObject) != null) {
+                    JSONObject commentObject = getCommentObject(fbObject);
+                    JSONArray commentArray = commentObject.getJSONArray("data");
+                    data[4] = String.valueOf(commentArray.length());
+                } else {
+                    data[4] = "0";
+                }*/
+
+                new LocalDBHandler(context).insertFBData(data);
+            }
+
+            JSONObject nextObject = object.getJSONObject("paging");
+            String next = nextObject.getString("next");
+            new LocalDBHandler(context).insertNextValue(next);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public JSONObject getCommentObject(JSONObject object) {
+        try {
+            return object.getJSONObject("comments");
+        } catch (JSONException e) {
+            return null;
         }
     }
 }
