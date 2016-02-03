@@ -295,7 +295,7 @@ public class HomeActivity extends AppCompatActivity
                         .replace(R.id.root_frame, new NewsFragment())
                         .commit();
             }
-        }, 300);
+        }, 3000);
     }
 
     private void hideOption(int id) {

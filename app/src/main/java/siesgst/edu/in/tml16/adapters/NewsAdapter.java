@@ -1,8 +1,11 @@
 package siesgst.edu.in.tml16.adapters;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,15 +31,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
 
     public NewsAdapter(Context context) {
         this.context = context;
-        feedNewsList = new ArrayList<>();
-
-        for (int i = 0; i < ((new LocalDBHandler(context)).getFBData()).size() - 2; i = i + 3) {
-            FeedNews feedNews = new FeedNews();
-            feedNews.setPostMessage((new LocalDBHandler(context)).getFBData().get(i));
-            feedNews.setPostImage((new LocalDBHandler(context)).getFBData().get(i + 1));
-            feedNews.setPostLink((new LocalDBHandler(context)).getFBData().get(i+2));
-            feedNewsList.add(feedNews);
-        }
+        addAl();
     }
 
     @Override
@@ -50,11 +45,24 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, int i) {
 
-        FeedNews feedEvents = feedNewsList.get(i);
+        final FeedNews feedEvents = feedNewsList.get(i);
 
         viewHolder.postMessage.setText(feedEvents.getPostMessage());
         Picasso.with(context).load(feedEvents.getPostImage()).into(viewHolder.postIcon);
         viewHolder.postLink = feedEvents.getPostLink();
+        viewHolder.readMore.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("fb://facewebmodal/f?href=" + feedEvents.getPostLink()));
+                    context.startActivity(intent);
+                } catch (Exception e) {
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(feedEvents.getPostLink()));
+                    context.startActivity(intent);
+                }
+
+            }
+        });
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
@@ -72,6 +80,18 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
             postMessage.setSelected(true);
             readMore = (AppCompatButton) itemView.findViewById(R.id.read_more);
         }
+    }
+
+    public void addAl() {
+        feedNewsList = new ArrayList<>();
+        for (int i = 0; i < (((new LocalDBHandler(context)).getFBData()).size()) - 3; i = i + 3) {
+            FeedNews feedNews = new FeedNews();
+            feedNews.setPostMessage((new LocalDBHandler(context)).getFBData().get(i));
+            feedNews.setPostImage((new LocalDBHandler(context)).getFBData().get(i + 1));
+            feedNews.setPostLink((new LocalDBHandler(context)).getFBData().get(i+2));
+            feedNewsList.add(feedNews);
+        }
+        notifyDataSetChanged();
     }
 
     @Override

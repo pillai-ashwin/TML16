@@ -114,13 +114,14 @@ public class LocalDBHandler extends SQLiteOpenHelper {
 
     public void wapasTableBana() {
         SQLiteDatabase db = getWritableDatabase();
+        db.execSQL("DROP TABLE IF EXISTS " + FB_DATA_TABLE);
+        db.execSQL(CREATE_FB_DATA_TABLE);
         db.execSQL("DROP TABLE IF EXISTS " + USER_TABLE_NAME);
         db.execSQL(CREATE_USER_TABLE);
         db.execSQL("DROP TABLE IF EXISTS " + EVENT_TABLE_NAME);
         db.execSQL(CREATE_EVENT_TABLE);
         db.execSQL("DROP TABLE IF EXISTS " + REG_TABLE_NAME);
         db.execSQL(CREATE_REG_TABLE);
-        db.execSQL("DROP TABLE IF EXISTS " + FB_DATA_TABLE);
         db.close();
     }
 
@@ -260,7 +261,7 @@ public class LocalDBHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.query(FB_DATA_TABLE, new String[] {F_MESSAGE, F_PICTURE, F_LINK } , null, null, null, null, null);
         ArrayList<String> arrayList = new ArrayList<>();
-        for (cursor.moveToFirst(); !cursor.isLast(); cursor.moveToNext()) {
+        for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
             arrayList.add(cursor.getString(cursor.getColumnIndex(F_MESSAGE)));
             arrayList.add(cursor.getString(cursor.getColumnIndex(F_PICTURE)));
             arrayList.add(cursor.getString(cursor.getColumnIndex(F_LINK)));
