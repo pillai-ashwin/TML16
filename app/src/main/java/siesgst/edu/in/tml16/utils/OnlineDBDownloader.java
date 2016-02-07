@@ -131,7 +131,7 @@ public class OnlineDBDownloader {
         }
     }
 
-    public void sendUserDetails(String email) {
+    public void sendUserEmail(String email) {
         String parameters = "uEmail=" + email;
         byte[] postData = parameters.getBytes(Charset.forName("UTF-8"));
         int postDataLength = postData.length;
@@ -164,6 +164,39 @@ public class OnlineDBDownloader {
 
         } catch (JSONException e) {
 
+        } finally {
+            if (conn != null)
+                conn.disconnect();
+        }
+    }
+
+    public void submitNewUserData(String fullName, String emailID, String phone, String year, String branch, String college, String division, String rollNO) {
+        String parameters = "uName=" + fullName + "&" + "uEmail=" + emailID + "&" + "uPhone=" + phone + "&" + "uYear=" + year + "&" + "uBranch=" + branch + "&" + "uCollege=" + college + "&" + "uDivision=" + division + "&" + "uRoll=" + rollNO;
+        byte[] postData = parameters.getBytes(Charset.forName("UTF-8"));
+        int postDataLength = postData.length;
+        HttpURLConnection conn = null;
+        try {
+            URL url = new URL(userDetailsLink);
+            conn = (HttpURLConnection) url.openConnection();
+            conn.setReadTimeout(10000000);
+            conn.setConnectTimeout(15000000);
+            conn.setRequestMethod("POST");
+            conn.setDoInput(true);
+            conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            conn.setRequestProperty("charset", "utf-8");
+            conn.setRequestProperty("Content-Length", Integer.toString(postDataLength));
+            conn.connect();
+            OutputStreamWriter writer = new OutputStreamWriter(conn.getOutputStream());
+            writer.write(parameters);
+            writer.flush();
+            writer.close();
+        } catch (SocketException e) {
+
+        } catch (IOException e) {
+
+        } finally {
+            if (conn != null)
+                conn.disconnect();
         }
     }
 

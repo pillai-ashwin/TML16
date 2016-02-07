@@ -73,7 +73,6 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginBottom="10dp"
-            android:text="+91234567890"
             android:textSize="17sp" />
 
 

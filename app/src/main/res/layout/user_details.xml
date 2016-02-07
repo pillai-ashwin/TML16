@@ -36,33 +36,6 @@
                 android:layout_height="wrap_content">
 
                 <EditText
-                    android:id="@+id/full_name"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Your Name"
-                    android:inputType="textCapCharacters" />
-
-            </android.support.design.widget.TextInputLayout>
-
-            <android.support.design.widget.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <EditText
-                    android:id="@+id/email_id"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="30dp"
-                    android:hint="Email Id"
-                    android:inputType="textEmailAddress" />
-
-            </android.support.design.widget.TextInputLayout>
-
-            <android.support.design.widget.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <EditText
                     android:id="@+id/phone_no"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -125,8 +98,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="15dp"
                     android:hint="Division"
-                    android:inputType="textCapCharacters"
-                    android:visibility="gone"/>
+                    android:inputType="textCapCharacters" />
 
             </android.support.design.widget.TextInputLayout>
 
@@ -140,8 +112,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="30dp"
                     android:hint="Roll No."
-                    android:inputType="textCapCharacters"
-                    android:visibility="gone"/>
+                    android:inputType="textCapCharacters" />
 
             </android.support.design.widget.TextInputLayout>
 

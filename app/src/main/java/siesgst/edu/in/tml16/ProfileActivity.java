@@ -18,8 +18,7 @@ import siesgst.edu.in.tml16.utils.QRInterface;
 public class ProfileActivity extends PreferenceActivity {
 
     private ImageView mProfilepic;
-    private TextView mUsername;
-    private TextView mEmail;
+    private TextView mUsername, mEmail, mPhone;
 
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
@@ -48,7 +47,11 @@ public class ProfileActivity extends PreferenceActivity {
         mEmail = (TextView) profile.findViewById(R.id.text_email);
         mEmail.setText(sharedPreferences.getString("email", ""));
 
-        Preference regCode = (Preference) findPreference("reg_code");
+        mPhone = (TextView) profile.findViewById(R.id.text_phone);
+        mPhone.setText(sharedPreferences.getString("uPhone", ""));
+
+        Preference regCode = findPreference("reg_code");
+        regCode.setSummary("TML2016" + sharedPreferences.getString("uID", ""));
         regCode.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
@@ -56,6 +59,18 @@ public class ProfileActivity extends PreferenceActivity {
                 return false;
             }
         });
+
+        Preference year = findPreference("year");
+        year.setSummary(sharedPreferences.getString("uYear",""));
+
+        Preference branch = findPreference("branch");
+        branch.setSummary(sharedPreferences.getString("uBranch",""));
+
+        Preference rollDiv = findPreference("roll_div");
+        rollDiv.setSummary(sharedPreferences.getString("uRoll","") + ", " + sharedPreferences.getString("uDivision",""));
+
+        Preference college = findPreference("college");
+        college.setSummary(sharedPreferences.getString("uCollege",""));
 
         ListView listView = getListView();
         listView.addHeaderView(profile);
