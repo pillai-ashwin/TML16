@@ -17,6 +17,7 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.SocketException;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 
 /**
@@ -24,12 +25,19 @@ import java.nio.charset.Charset;
  */
 public class OnlineDBDownloader {
 
-    private JSONArray JSON;
     final String link = "http://tml.siesgst.ac.in/includes/resources.php";
     final String regLink = "http://tml.siesgst.ac.in/validate/validate.php";
-    final String fbLink = "https://graph.facebook.com/siesgst.TML/feed?fields=message,full_picture,likes,comments,link&&access_token=CAAXxzdZCX7lkBAGdnbDswtUqpEhCqEpQCOGsVwXBUI8WZBaGuc1hzKSvg7uuhjGfMkIiwpqAQoHSB9o7PyltY0PUXYusH5JV0Wsz9psIY19UV6tY6bUZCOHwtoGZAUWnMpq1Qwx3QAJO4kCs1YH6lijNFIgNemz71bxBiXse8sDQLnLXatIT0fegQt6fqYhpsuzeI2CJwgZDZD";
+    final String fbLink = "https://graph.facebook.com/siesgst.TML/feed?fields=message,full_picture,likes.summary(true),comments.summary(true),link&&access_token=CAAXxzdZCX7lkBAGdnbDswtUqpEhCqEpQCOGsVwXBUI8WZBaGuc1hzKSvg7uuhjGfMkIiwpqAQoHSB9o7PyltY0PUXYusH5JV0Wsz9psIY19UV6tY6bUZCOHwtoGZAUWnMpq1Qwx3QAJO4kCs1YH6lijNFIgNemz71bxBiXse8sDQLnLXatIT0fegQt6fqYhpsuzeI2CJwgZDZD";
+    final String userDetailsLink = "http://tml.siesgst.ac.in/includes/MobileUserProfile.php";
+
+    private JSONArray JSON;
+    private JSONArray userDetailsArray;
+    private JSONArray regEventDetailsArray;
 
     private JSONObject fbObject;
+    public boolean userExists;
+
+
     Context context;
 
     SharedPreferences sharedPreferences;
@@ -50,7 +58,7 @@ public class OnlineDBDownloader {
             conn.setDoInput(true);
             conn.connect();
             JSONObject object = new JSONObject(convertStreamToString(conn.getInputStream()));
-            JSON = object.getJSONArray("events");
+            JSON = object.optJSONArray("events");
         } catch (IOException e) {
             e.printStackTrace();
         } catch (JSONException e) {
@@ -123,6 +131,42 @@ public class OnlineDBDownloader {
         }
     }
 
+    public void sendUserDetails(String email) {
+        String parameters = "uEmail=" + email;
+        byte[] postData = parameters.getBytes(Charset.forName("UTF-8"));
+        int postDataLength = postData.length;
+        HttpURLConnection conn = null;
+        try {
+            URL url = new URL(userDetailsLink);
+            conn = (HttpURLConnection) url.openConnection();
+            conn.setReadTimeout(5000);
+            conn.setConnectTimeout(5000);
+            conn.setRequestMethod("POST");
+            conn.setDoInput(true);
+            conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            conn.setRequestProperty("charset", "utf-8");
+            conn.setRequestProperty("Content-Length", Integer.toString(postDataLength));
+            conn.connect();
+            OutputStreamWriter writer = new OutputStreamWriter(conn.getOutputStream());
+            writer.write(parameters);
+            writer.flush();
+            JSONObject object = new JSONObject(convertStreamToString(conn.getInputStream()));
+            String check = object.optString("user_exists");
+            if(check.equals("1")) {
+                userExists = true;
+                userDetailsArray = object.optJSONArray("user_details");
+                regEventDetailsArray = object.optJSONArray("event_details");
+            } else {
+                userExists = false;
+            }
+            writer.close();
+        } catch (IOException e) {
+
+        } catch (JSONException e) {
+
+        }
+    }
+
     // Reads an InputStream and converts it to a String.
     private String convertStreamToString(InputStream is) {
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
@@ -152,5 +196,13 @@ public class OnlineDBDownloader {
 
     public JSONObject getFBObject() {
         return fbObject;
+    }
+
+    public JSONArray getUserDetailsArray() { return userDetailsArray;}
+
+    public JSONArray getRegEventDetailsArray() { return regEventDetailsArray;}
+
+    public boolean getUserStatus() {
+        return userExists;
     }
 }

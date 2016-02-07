@@ -5,7 +5,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatButton;
 import android.util.Log;
@@ -19,7 +21,10 @@ import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 
+import org.json.JSONArray;
+
 import siesgst.edu.in.tml16.utils.ConnectionUtils;
+import siesgst.edu.in.tml16.utils.OnlineDBDownloader;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class LoginActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
@@ -29,6 +34,8 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     private GoogleApiClient mGoogleApiClient;
 
     private ProgressDialog progressDialog;
+
+    Intent i;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,7 +110,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
             GoogleSignInAccount acct = result.getSignInAccount();
 
-            Intent i = new Intent();
+            i = new Intent(this, HomeActivity.class);
             i.putExtra("username", acct.getDisplayName());
             i.putExtra("email", acct.getEmail());
             try {
@@ -111,9 +118,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             } catch (NullPointerException e) {
                 i.putExtra("profile_pic", "");
             }
-            setResult(RESULT_OK, i);
-            progressDialog.dismiss();
-            finish();
+            new UserDetailDownload().execute(acct.getEmail());
         } else {
             Toast.makeText(LoginActivity.this, "Error Signing in.\nPlease check your internet connection or try again.", Toast.LENGTH_SHORT).show();
         }
@@ -127,5 +132,48 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     @Override
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+    }
+
+    public void setFinalCall(Intent intent, boolean bool) {
+        intent.putExtra("user_exists", bool);
+        setResult(RESULT_OK, intent);
+        progressDialog.dismiss();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                finish();
+            }
+        }, 1000);
+    }
+
+    private class UserDetailDownload extends AsyncTask <String, Void, Void> {
+        JSONArray userArray;
+        JSONArray eventArray;
+
+        OnlineDBDownloader downloader;
+
+        @Override
+        protected Void doInBackground(String... params) {
+            downloader = new OnlineDBDownloader(LoginActivity.this);
+            downloader.sendUserDetails(params[0]);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void v) {
+            if (downloader.getUserStatus()) {
+                setFinalCall(i, true);
+            } else {
+                setContentView(R.layout.user_details);
+                progressDialog.dismiss();
+                AppCompatButton button = (AppCompatButton) findViewById(R.id.submit);
+                button.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        setFinalCall(i, false);
+                    }
+                });
+            }
+        }
     }
 }

@@ -1,8 +1,11 @@
 package siesgst.edu.in.tml16.adapters;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Handler;
 import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -28,10 +31,11 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
 
     List<FeedNews> feedNewsList;
     Context context;
+    FeedNews feedEvents;
 
     public NewsAdapter(Context context) {
         this.context = context;
-        addAl();
+        new LoadAdapterData().execute();
     }
 
     @Override
@@ -43,24 +47,47 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder viewHolder, int i) {
+    public void onBindViewHolder(final ViewHolder viewHolder, int i) {
 
-        final FeedNews feedEvents = feedNewsList.get(i);
+        feedEvents = feedNewsList.get(i);
+        try {
+            viewHolder.postIcon.setVisibility(View.VISIBLE);
+            Picasso.with(context).load(feedEvents.getPostImage()).placeholder(R.mipmap.ic_launcher).into(viewHolder.postIcon);
+        } catch (IllegalArgumentException e) {
+            viewHolder.postIcon.setVisibility(View.GONE);
+            //Picasso.with(context).load(R.mipmap.ic_launcher).into(viewHolder.postIcon);
+        }
 
-        viewHolder.postMessage.setText(feedEvents.getPostMessage());
-        Picasso.with(context).load(feedEvents.getPostImage()).into(viewHolder.postIcon);
-        viewHolder.postLink = feedEvents.getPostLink();
+        if(!feedEvents.getPostMessage().isEmpty()) {
+            viewHolder.postMessage.setVisibility(View.VISIBLE);
+            viewHolder.postMessage.setText(feedEvents.getPostMessage());
+        } else {
+            viewHolder.postMessage.setVisibility(View.GONE);
+        }
+
+        if (!feedEvents.getPostLink().isEmpty()) {
+            viewHolder.postLink = feedEvents.getPostLink();
+        } else {
+            viewHolder.postLink = "www.facebook.com/siesgst.TML/";
+        }
         viewHolder.readMore.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try {
-                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("fb://facewebmodal/f?href=" + feedEvents.getPostLink()));
-                    context.startActivity(intent);
-                } catch (Exception e) {
-                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(feedEvents.getPostLink()));
-                    context.startActivity(intent);
-                }
-
+                readMore(viewHolder.postLink);
+            }
+        });
+        viewHolder.likes.setText(feedEvents.getLikes());
+        viewHolder.likes.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                readMore(viewHolder.postLink);
+            }
+        });
+        viewHolder.comments.setText(feedEvents.getComments());
+        viewHolder.comments.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                readMore(viewHolder.postLink);
             }
         });
     }
@@ -71,6 +98,10 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
         protected TextView postMessage;
         protected String postLink;
         protected AppCompatButton readMore;
+        protected TextView likes;
+        protected TextView comments;
+        protected ImageView iconLikes;
+        protected ImageView iconComments;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -79,23 +110,56 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
             postMessage = (TextView) itemView.findViewById(R.id.news_title);
             postMessage.setSelected(true);
             readMore = (AppCompatButton) itemView.findViewById(R.id.read_more);
+            likes = (TextView) itemView.findViewById(R.id.likes);
+            comments = (TextView) itemView.findViewById(R.id.comments);
+            iconLikes = (ImageView) itemView.findViewById(R.id.icon_likes);
+            iconComments = (ImageView) itemView.findViewById(R.id.icon_comments);
         }
     }
 
-    public void addAl() {
-        feedNewsList = new ArrayList<>();
-        for (int i = 0; i < (((new LocalDBHandler(context)).getFBData()).size()) - 3; i = i + 3) {
-            FeedNews feedNews = new FeedNews();
-            feedNews.setPostMessage((new LocalDBHandler(context)).getFBData().get(i));
-            feedNews.setPostImage((new LocalDBHandler(context)).getFBData().get(i + 1));
-            feedNews.setPostLink((new LocalDBHandler(context)).getFBData().get(i+2));
-            feedNewsList.add(feedNews);
+    public void readMore(String postLink) {
+        try {
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("fb://facewebmodal/f?href=" + postLink));
+            context.startActivity(intent);
+        } catch (Exception e) {
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(feedEvents.getPostLink()));
+            context.startActivity(intent);
         }
-        notifyDataSetChanged();
     }
 
     @Override
     public int getItemCount() {
         return feedNewsList.size();
+    }
+
+    private class LoadAdapterData extends AsyncTask<Void, Void, Void> {
+        LocalDBHandler localDBHandler;
+
+        @Override
+        protected void onPreExecute() {
+            localDBHandler = new LocalDBHandler(context);
+            feedNewsList = new ArrayList<>();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+                for (int i = 0; i < (localDBHandler.getFBData().size()) - 5; i = i + 5) {
+                    FeedNews feedNews = new FeedNews();
+                    feedNews.setPostMessage(localDBHandler.getFBData().get(i));
+                    feedNews.setPostImage(localDBHandler.getFBData().get(i + 1));
+                    feedNews.setPostLink(localDBHandler.getFBData().get(i + 2));
+                    feedNews.setNoOfLikes(localDBHandler.getFBData().get(i + 3));
+                    feedNews.setNoOfComments(localDBHandler.getFBData().get(i + 4));
+                    feedNewsList.add(feedNews);
+                }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            notifyDataSetChanged();
+        }
+
+
     }
 }

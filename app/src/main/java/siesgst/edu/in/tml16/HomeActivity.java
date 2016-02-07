@@ -11,6 +11,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -85,7 +86,6 @@ public class HomeActivity extends AppCompatActivity
 
         //Login Screen
         if (sharedPreferences.getInt("login_status", 0) == 0) {
-
             startActivityForResult(new Intent(this, LoginActivity.class), 0);
         }
 
@@ -167,6 +167,7 @@ public class HomeActivity extends AppCompatActivity
     protected void onActivityResult(int requestCode, int responseCode, Intent intent) {
 
         editor = sharedPreferences.edit();
+        final ProgressDialog progressDialog = ProgressDialog.show(this, "Few more Seconds", "Please Wait...");
 
         if (requestCode == 0 && responseCode == RESULT_OK) {
 
@@ -175,17 +176,34 @@ public class HomeActivity extends AppCompatActivity
             editor.putString("username", intent.getStringExtra("username"));
             editor.putString("email", intent.getStringExtra("email"));
             editor.putString("profile_pic", intent.getStringExtra("profile_pic"));
+            editor.putBoolean("user_exists", intent.getBooleanExtra("user_exists", false));
             editor.apply();
 
-            //Go back to Home screen once logged in.
-            startActivity(new Intent(this, HomeActivity.class));
-            finish();
+            setUpFirstTimeLogin();
+
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    progressDialog.dismiss();
+                    startActivity(new Intent(HomeActivity.this, HomeActivity.class));
+                    finish();
+                }
+            }, 3000);
         } else if (requestCode == 0 && responseCode == RESULT_CANCELED) {
             editor.remove("login_status");
             editor.putInt("login_status", 1);
             editor.apply();
-            startActivity(new Intent(this, HomeActivity.class));
-            finish();
+
+            setUpFirstTimeLogin();
+
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    progressDialog.dismiss();
+                    startActivity(new Intent(HomeActivity.this, HomeActivity.class));
+                    finish();
+                }
+            }, 3000);
         } else if (requestCode == 0 && responseCode == 1) {
             if (sharedPreferences.getBoolean("first_time", true)) {
                 if (sharedPreferences.getInt("login_status", 0) == 0) {
@@ -288,6 +306,7 @@ public class HomeActivity extends AppCompatActivity
     }
 
     public void setUpHomeLayout() {
+        final ProgressDialog progressDialog = ProgressDialog.show(this, "", "Loading...");
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -295,7 +314,27 @@ public class HomeActivity extends AppCompatActivity
                         .replace(R.id.root_frame, new NewsFragment())
                         .commit();
             }
-        }, 3000);
+        }, 300);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                progressDialog.dismiss();
+            }
+        }, 5000);
+    }
+
+    public void setUpFirstTimeLogin() {
+        if(new ConnectionUtils(this).checkConnection()) {
+            new FBDataDownload().execute();
+            new EventListDownload().execute();
+        } else {
+            Snackbar.make(getWindow().getDecorView(), "Can't connect right now.", Snackbar.LENGTH_INDEFINITE).setAction("RETRY", new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    setUpFirstTimeLogin();
+                }
+            });
+        }
     }
 
     private void hideOption(int id) {
@@ -327,6 +366,7 @@ public class HomeActivity extends AppCompatActivity
                             editor.remove("email");
                             editor.remove("profile_pic");
                             editor.putInt("login_status", 1);
+                            editor.remove("user_exists");
                             editor.apply();
                         }
                     }

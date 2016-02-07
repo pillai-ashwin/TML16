@@ -18,7 +18,7 @@ public class LocalDBHandler extends SQLiteOpenHelper {
     final String U_KEY = "uID";
     final String U_NAME = "uName";
     final String U_EMAIL = "uEmail";
-    final String U_PHONE= "uPhone";
+    final String U_PHONE = "uPhone";
     final String YEAR = "Year";
     final String BRANCH = "Branch";
     final String DIVISION = "Division";
@@ -56,7 +56,7 @@ public class LocalDBHandler extends SQLiteOpenHelper {
     final String REG_TABLE_NAME = "reg_table";
     final String FB_DATA_TABLE = "fb_data";
 
-    final String CREATE_USER_TABLE  = "CREATE TABLE IF NOT EXISTS user_table(uID INTEGER PRIMARY KEY AUTOINCREMENT," +
+    final String CREATE_USER_TABLE = "CREATE TABLE IF NOT EXISTS user_table(uID INTEGER PRIMARY KEY AUTOINCREMENT," +
             "uName VARCHAR DEFAULT NULL," +
             "uEmail VARCHAR DEFAULT NULL," +
             "uPhone VARCHAR DEFAULT NULL," +
@@ -94,7 +94,6 @@ public class LocalDBHandler extends SQLiteOpenHelper {
             "fNext VARCHAR DEFAULT NULL)";
 
 
-
     public LocalDBHandler(Context context) {
         super(context, "tml_event_details", null, 1);
     }
@@ -122,6 +121,13 @@ public class LocalDBHandler extends SQLiteOpenHelper {
         db.execSQL(CREATE_EVENT_TABLE);
         db.execSQL("DROP TABLE IF EXISTS " + REG_TABLE_NAME);
         db.execSQL(CREATE_REG_TABLE);
+        db.close();
+    }
+
+    public void dropFBTable() {
+        SQLiteDatabase db = getWritableDatabase();
+        db.execSQL("DROP TABLE IF EXISTS " + FB_DATA_TABLE);
+        db.execSQL(CREATE_FB_DATA_TABLE);
         db.close();
     }
 
@@ -191,9 +197,8 @@ public class LocalDBHandler extends SQLiteOpenHelper {
         values.put(F_MESSAGE, data[0]);
         values.put(F_PICTURE, data[1]);
         values.put(F_LINK, data[2]);
-        /*values.put(F_LIKES, data[3]);
+        values.put(F_LIKES, data[3]);
         values.put(F_COMMENTS, data[4]);
-        values.put(F_NEXT, data[5]);*/
         db.insert(FB_DATA_TABLE, null, values);
         db.close();
     }
@@ -207,7 +212,7 @@ public class LocalDBHandler extends SQLiteOpenHelper {
     }
 
     public ArrayList<String> getEventNamesAndDay(String category, String subCategory) {
-        SQLiteDatabase db=getReadableDatabase();
+        SQLiteDatabase db = getReadableDatabase();
         Cursor cursor;
         if (subCategory != null) {
             cursor = db.query(EVENT_TABLE_NAME, new String[]{E_NAME, E_DAY}, E_CATEGORY + "='" + category + "' and " + E_SUBCATEGORY + "='" + subCategory + "'", null, null, null, null, null);
@@ -226,8 +231,8 @@ public class LocalDBHandler extends SQLiteOpenHelper {
     }
 
     public ArrayList<String> getAllEventNames() {
-        SQLiteDatabase db=getReadableDatabase();
-        Cursor cursor = db.query(EVENT_TABLE_NAME, new String[] {E_NAME}, null, null, null, null, null, null);
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.query(EVENT_TABLE_NAME, new String[]{E_NAME}, null, null, null, null, null, null);
         ArrayList<String> arrayList = new ArrayList<>();
         for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
             arrayList.add(cursor.getString(cursor.getColumnIndex(E_NAME)));
@@ -240,7 +245,7 @@ public class LocalDBHandler extends SQLiteOpenHelper {
 
     public ArrayList<String> getEventKaSabKuch(String eventName) {
         SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = db.query(EVENT_TABLE_NAME, new String[] {E_DETAIL, E_DAY, E_VENUE, EVENT_HEAD_1, EVENT_HEAD_2, E_PHONE_1, E_PHONE_2}, E_NAME +"='" + eventName + "'", null, null, null, null);
+        Cursor cursor = db.query(EVENT_TABLE_NAME, new String[]{E_DETAIL, E_DAY, E_VENUE, EVENT_HEAD_1, EVENT_HEAD_2, E_PHONE_1, E_PHONE_2}, E_NAME + "='" + eventName + "'", null, null, null, null);
         ArrayList<String> arrayList = new ArrayList<>();
         for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
             arrayList.add(cursor.getString(cursor.getColumnIndex(E_DETAIL)));
@@ -259,12 +264,14 @@ public class LocalDBHandler extends SQLiteOpenHelper {
 
     public ArrayList<String> getFBData() {
         SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = db.query(FB_DATA_TABLE, new String[] {F_MESSAGE, F_PICTURE, F_LINK } , null, null, null, null, null);
+        Cursor cursor = db.query(FB_DATA_TABLE, new String[]{F_MESSAGE, F_PICTURE, F_LINK, F_LIKES, F_COMMENTS}, null, null, null, null, null);
         ArrayList<String> arrayList = new ArrayList<>();
         for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
             arrayList.add(cursor.getString(cursor.getColumnIndex(F_MESSAGE)));
             arrayList.add(cursor.getString(cursor.getColumnIndex(F_PICTURE)));
             arrayList.add(cursor.getString(cursor.getColumnIndex(F_LINK)));
+            arrayList.add(cursor.getString(cursor.getColumnIndex(F_LIKES)));
+            arrayList.add(cursor.getString(cursor.getColumnIndex(F_COMMENTS)));
         }
         cursor.close();
         db.close();

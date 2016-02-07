@@ -35,8 +35,6 @@ import siesgst.edu.in.tml16.utils.OnlineDBDownloader;
  */
 public class NewsFragment extends Fragment {
 
-    ProgressDialog progressDialog;
-
     RecyclerView recyclerView;
     NewsAdapter newsAdapter;
     SwipeRefreshLayout swipeRefreshLayout;
@@ -55,8 +53,6 @@ public class NewsFragment extends Fragment {
         recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        newsAdapter = new NewsAdapter(getActivity());
-        recyclerView.setAdapter(newsAdapter);
         swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.refresh_view);
         swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimaryDark, R.color.colorAccent);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -66,60 +62,47 @@ public class NewsFragment extends Fragment {
             }
         });
 
-        swipeRefreshLayout.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                swipeRefreshLayout.setRefreshing(true);
-                onRefreshData();
-                swipeRefreshLayout.setRefreshing(false);
-            }
-        }, 1000);
+        onRefreshData();
 
         return view;
     }
 
     public void onRefreshData() {
-        new Handler().post(new Runnable() {
-            @Override
-            public void run() {
-                if(new ConnectionUtils(getActivity()).checkConnection())  {
-                    new LocalDBHandler(getActivity()).wapasTableBana();
-                    new FBDataDownload().execute();
-                } else {
-                    Snackbar.make(getView(),"Can't connect to network..", Snackbar.LENGTH_INDEFINITE).setAction("Try Again", new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            onRefreshData();
-                        }
-                    }).show();
-                }
-            }
-        });
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                newsAdapter = new NewsAdapter(getActivity());
-                recyclerView.setAdapter(newsAdapter);
-                swipeRefreshLayout.setRefreshing(false);
-            }
-        }, 3000);
+        swipeRefreshLayout.setRefreshing(true);
+        new FBDataDownload().execute();
     }
 
     private class FBDataDownload extends AsyncTask<Void, Void, JSONObject> {
         JSONObject object;
 
         @Override
+        protected void onPreExecute() {
+            if (new ConnectionUtils(getActivity()).checkConnection()) {
+                new LocalDBHandler(getActivity()).dropFBTable();
+            } else {
+                Snackbar.make(getView(), "Can't connect to network..", Snackbar.LENGTH_INDEFINITE).setAction("Try Again", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        onRefreshData();
+                    }
+                }).show();
+            }
+        }
+
+        @Override
         protected JSONObject doInBackground(Void... params) {
             OnlineDBDownloader downloader = new OnlineDBDownloader(getActivity());
             downloader.getFacebookData();
             object = downloader.getFBObject();
+            new DataHandler(getActivity()).pushFBData(object);
             return object;
         }
 
         @Override
         protected void onPostExecute(JSONObject object) {
-            new DataHandler(getActivity()).pushFBData(object);
-
+            newsAdapter = new NewsAdapter(getActivity());
+            recyclerView.setAdapter(newsAdapter);
+            swipeRefreshLayout.setRefreshing(false);
         }
     }
 }
