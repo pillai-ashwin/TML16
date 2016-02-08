@@ -2,17 +2,31 @@ package siesgst.edu.in.tml16;
 
 import android.app.Dialog;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceCategory;
+import android.preference.PreferenceScreen;
+import android.support.design.widget.Snackbar;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.AppCompatButton;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONArray;
+
+import siesgst.edu.in.tml16.utils.ConnectionUtils;
+import siesgst.edu.in.tml16.utils.DataHandler;
+import siesgst.edu.in.tml16.utils.LocalDBHandler;
+import siesgst.edu.in.tml16.utils.OnlineDBDownloader;
 import siesgst.edu.in.tml16.utils.QRInterface;
 
 public class ProfileActivity extends PreferenceActivity {
@@ -21,7 +35,12 @@ public class ProfileActivity extends PreferenceActivity {
     private TextView mUsername, mEmail, mPhone;
 
     private SharedPreferences sharedPreferences;
-    private SharedPreferences.Editor editor;
+    SharedPreferences.Editor editor;
+
+    SwipeRefreshLayout swipeRefreshLayout;
+
+    PreferenceScreen preferenceScreen;
+    PreferenceCategory preferenceCategory;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +54,7 @@ public class ProfileActivity extends PreferenceActivity {
         View profile = getLayoutInflater().inflate(R.layout.profile_card, null);
 
         mProfilepic = (ImageView) profile.findViewById(R.id.profile_pic1);
-        if (!sharedPreferences.getString("profile_pic","").equals("")) {
+        if (!sharedPreferences.getString("profile_pic", "").equals("")) {
             Picasso.with(this).load(sharedPreferences.getString("profile_pic", "")).into(mProfilepic);
         } else {
             mProfilepic.setImageResource(R.mipmap.ic_launcher);
@@ -61,16 +80,30 @@ public class ProfileActivity extends PreferenceActivity {
         });
 
         Preference year = findPreference("year");
-        year.setSummary(sharedPreferences.getString("uYear",""));
+        year.setSummary(sharedPreferences.getString("uYear", ""));
 
         Preference branch = findPreference("branch");
-        branch.setSummary(sharedPreferences.getString("uBranch",""));
+        branch.setSummary(sharedPreferences.getString("uBranch", ""));
 
         Preference rollDiv = findPreference("roll_div");
-        rollDiv.setSummary(sharedPreferences.getString("uRoll","") + ", " + sharedPreferences.getString("uDivision",""));
+        rollDiv.setSummary(sharedPreferences.getString("uRoll", "") + ", " + sharedPreferences.getString("uDivision", ""));
 
         Preference college = findPreference("college");
-        college.setSummary(sharedPreferences.getString("uCollege",""));
+        college.setSummary(sharedPreferences.getString("uCollege", ""));
+
+        preferenceCategory = (PreferenceCategory) (findPreference("event_perf"));
+        preferenceScreen = getPreferenceScreen();
+
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.refresh_view);
+        swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimaryDark, R.color.colorAccent);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                onRefreshData();
+            }
+        });
+
+        onRefreshData();
 
         ListView listView = getListView();
         listView.addHeaderView(profile);
@@ -91,5 +124,75 @@ public class ProfileActivity extends PreferenceActivity {
         QRInterface qrInterface = new QRInterface();
         ((ImageView) alertDialog.findViewById(R.id.qr_code_image)).setImageBitmap(qrInterface.encodeQRcode("TML2016_0001", 200, 200));
         alertDialog.show();
+    }
+
+    public void onRefreshData() {
+        swipeRefreshLayout.setRefreshing(true);
+        new AddProfileData().execute();
+    }
+
+    private class AddProfileData extends AsyncTask<Void, Void, Void> {
+
+        JSONArray eventArray;
+        SharedPreferences sharedPreferences;
+
+        LocalDBHandler localDBHandler = new LocalDBHandler(ProfileActivity.this);
+
+        @Override
+        protected void onPreExecute() {
+            if (new ConnectionUtils(ProfileActivity.this).checkConnection()) {
+                localDBHandler.dropRegEventTable();
+            } else {
+                Toast.makeText(ProfileActivity.this, "Check your internet connection", Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            final OnlineDBDownloader downloader = new OnlineDBDownloader(ProfileActivity.this);
+            sharedPreferences = getSharedPreferences("TML", MODE_PRIVATE);
+            editor = sharedPreferences.edit();
+            if (new ConnectionUtils(ProfileActivity.this).checkConnection()) {
+                downloader.sendUserEmail(sharedPreferences.getString("email", ""));
+                eventArray = downloader.getRegEventDetailsArray();
+                if (!String.valueOf(eventArray.length()).equals("0")) {
+                    new DataHandler(ProfileActivity.this).pushRegEvents(eventArray);
+                    editor.remove("null_array");
+                    editor.putString("null_array", "no");
+                    editor.apply();
+                } else {
+                    editor.remove("null_array");
+                    editor.putString("null_array", "yes");
+                    editor.apply();
+                }
+            } else {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(ProfileActivity.this, "Check your internet connection", Toast.LENGTH_SHORT).show();
+                        swipeRefreshLayout.setRefreshing(false);
+                    }
+                });
+            }
+            preferenceCategory.removeAll();
+            if (!sharedPreferences.getString("null_array", "").equals("yes")) {
+                for (int i = 0; i < localDBHandler.getRegEventData().size(); i = i + 2) {
+                    Preference preferenceEvent = new Preference(ProfileActivity.this);
+                    preferenceEvent.setTitle(localDBHandler.getRegEventData().get(i));
+                    preferenceEvent.setSummary(localDBHandler.getRegEventData().get(i + 1));
+                    preferenceCategory.addPreference(preferenceEvent);
+                }
+            } else {
+                Preference preferenceEvent = new Preference(ProfileActivity.this);
+                preferenceEvent.setSummary("You have not registered for any event.");
+                preferenceCategory.addPreference(preferenceEvent);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            swipeRefreshLayout.setRefreshing(false);
+        }
     }
 }

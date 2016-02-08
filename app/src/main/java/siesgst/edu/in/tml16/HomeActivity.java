@@ -137,21 +137,6 @@ public class HomeActivity extends AppCompatActivity
             } else {
                 mEmail.setText(sharedPreferences.getString("email", ""));
             }
-
-            /*new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    checkDatabaseIntegrity();
-                }
-            }, 2000);*/
-
-            //new FBDataDownload().execute();
-
-            if (getIntent().getBooleanExtra("reg_click", false)) {
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.root_frame, new RegistrationFragment())
-                        .commit();
-            }
         }
     }
 
@@ -167,7 +152,7 @@ public class HomeActivity extends AppCompatActivity
     protected void onActivityResult(int requestCode, int responseCode, Intent intent) {
 
         editor = sharedPreferences.edit();
-        final ProgressDialog progressDialog = ProgressDialog.show(this, "Few more Seconds", "Please Wait...");
+        final ProgressDialog progressDialog = ProgressDialog.show(this, "Setting up..", "Please Wait...");
 
         if (requestCode == 0 && responseCode == RESULT_OK) {
 
@@ -286,6 +271,7 @@ public class HomeActivity extends AppCompatActivity
                 }, 300);
                 break;
             case R.id.venue:
+                Toast.makeText(this, "Checkout for upcoming updates for this feature..", Toast.LENGTH_SHORT).show();
                 break;
 
             case R.id.register:
@@ -324,7 +310,7 @@ public class HomeActivity extends AppCompatActivity
     }
 
     public void setUpFirstTimeLogin() {
-        if(new ConnectionUtils(this).checkConnection()) {
+        if (new ConnectionUtils(this).checkConnection()) {
             new FBDataDownload().execute();
             new EventListDownload().execute();
         } else {
@@ -361,12 +347,8 @@ public class HomeActivity extends AppCompatActivity
                                     startActivityForResult(new Intent(HomeActivity.this, LoginActivity.class), 0);
                                 }
                             }, 200);
-                            editor.remove("login_status");
-                            editor.remove("username");
-                            editor.remove("email");
-                            editor.remove("profile_pic");
-                            editor.putInt("login_status", 1);
-                            editor.remove("user_exists");
+                            new LocalDBHandler(HomeActivity.this).wapasTableBana();
+                            editor.clear();
                             editor.apply();
                         }
                     }
@@ -391,12 +373,16 @@ public class HomeActivity extends AppCompatActivity
 
         @Override
         protected void onPostExecute(JSONArray jsonArray) {
-            new DataHandler(HomeActivity.this).decodeAndPushJSON(jsonArray);
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putInt(dbVersion, new LocalDBHandler(getApplicationContext()).getDBVersion());
-            editor.apply();
-            // progressDialog.dismiss();
-
+            if (!sharedPreferences.getString("nw_status", "").equals("bad")) {
+                new DataHandler(HomeActivity.this).decodeAndPushJSON(jsonArray);
+            } else {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(HomeActivity.this, "Check your internet connection...", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
         }
     }
 
@@ -413,8 +399,16 @@ public class HomeActivity extends AppCompatActivity
 
         @Override
         protected void onPostExecute(JSONObject object) {
-            new DataHandler(HomeActivity.this).pushFBData(object);
-
+            if (!sharedPreferences.getString("nw_status", "").equals("bad")) {
+                new DataHandler(HomeActivity.this).pushFBData(object);
+            } else {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(HomeActivity.this, "Check your internet connection...", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
         }
     }
 }

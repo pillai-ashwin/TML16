@@ -21,7 +21,7 @@
         android:key="college"
         android:title="College"/>
 
-    <PreferenceCategory android:title="Registered events">
+    <PreferenceCategory android:key="event_perf" android:title="Registered events">
 
     </PreferenceCategory>
 

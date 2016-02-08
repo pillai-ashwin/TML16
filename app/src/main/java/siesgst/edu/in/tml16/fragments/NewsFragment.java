@@ -2,10 +2,12 @@ package siesgst.edu.in.tml16.fragments;
 
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -16,9 +18,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
+import com.sromku.simple.fb.entities.Privacy;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -39,6 +43,7 @@ public class NewsFragment extends Fragment {
     NewsAdapter newsAdapter;
     SwipeRefreshLayout swipeRefreshLayout;
 
+    CoordinatorLayout layout;
     public NewsFragment() {
         // Required empty public constructor
     }
@@ -80,21 +85,31 @@ public class NewsFragment extends Fragment {
             if (new ConnectionUtils(getActivity()).checkConnection()) {
                 new LocalDBHandler(getActivity()).dropFBTable();
             } else {
-                Snackbar.make(getView(), "Can't connect to network..", Snackbar.LENGTH_INDEFINITE).setAction("Try Again", new View.OnClickListener() {
+                /*Snackbar.make(layout, "Can't connect to network..", Snackbar.LENGTH_INDEFINITE).setAction("Try Again", new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         onRefreshData();
                     }
-                }).show();
+                }).show();*/
             }
         }
 
         @Override
         protected JSONObject doInBackground(Void... params) {
+            SharedPreferences sharedPreferences = getActivity().getSharedPreferences("TML", Context.MODE_PRIVATE);
             OnlineDBDownloader downloader = new OnlineDBDownloader(getActivity());
             downloader.getFacebookData();
             object = downloader.getFBObject();
-            new DataHandler(getActivity()).pushFBData(object);
+            if (!sharedPreferences.getString("nw_status", "").equals("bad")) {
+                new DataHandler(getActivity()).pushFBData(object);
+            } else {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getActivity(), "Check your internet connection...", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
             return object;
         }
 

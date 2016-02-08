@@ -78,4 +78,23 @@ public class DataHandler {
             new LocalDBHandler(context).insertFBData(data);
         }
     }
+
+    public void pushRegEvents(JSONArray array) {
+        JSONObject object;
+        int length;
+
+        try {
+            length = array.length();
+            for (int i = 0; i < length; i++) {
+                object = array.optJSONObject(i);
+                String[] events = new String[2];
+                events[0] = object.optString("eName");
+                events[1] = object.optString("upayment_status");
+
+                new LocalDBHandler(context).insertRegEvents(events);
+            }
+        } catch (NullPointerException e) {
+
+        }
+    }
 }

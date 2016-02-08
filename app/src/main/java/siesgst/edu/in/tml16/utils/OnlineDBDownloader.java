@@ -17,7 +17,6 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.SocketException;
 import java.net.URL;
-import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 
 /**
@@ -48,6 +47,8 @@ public class OnlineDBDownloader {
     }
 
     public void downloadData() {
+        sharedPreferences = context.getSharedPreferences("TML", Context.MODE_PRIVATE);
+        editor = sharedPreferences.edit();
         HttpURLConnection conn = null;
         try {
             URL url = new URL(link);
@@ -61,6 +62,8 @@ public class OnlineDBDownloader {
             JSON = object.optJSONArray("events");
         } catch (IOException e) {
             e.printStackTrace();
+            editor.putString("nw_status", "bad");
+            editor.apply();
         } catch (JSONException e) {
             e.printStackTrace();
         } finally {
@@ -71,7 +74,7 @@ public class OnlineDBDownloader {
     }
 
     public void submitRegData(String fullName, String emailID, String phone, String year, String branch, String college, String division, String rollNO, String event) {
-        String parameters = "uName=" + fullName + "&" + "uEmail=" + emailID + "&" + "uPhone=" + phone + "&" + "uYear=" + year + "&" + "uBranch=" + branch + "&" + "uCollege=" + college + "&" + "uDivision=" + division + "&" + "uRoll=" + rollNO + "&" + "uEvent=" + event;
+        String parameters = "uName=" + fullName + "&" + "uEmail=" + emailID + "&" + "uPhone=" + phone + "&" + "uYear=" + year + "&" + "uBranch=" + branch + "&" + "uCollege=" + college + "&" + "uDivision=" + division + "&" + "uRoll=" + rollNO + "&" + "uEvent=" + event + "&" + "uAmount=0&uPaymentStatus=Amount Due";
         byte[] postData = parameters.getBytes(Charset.forName("UTF-8"));
         int postDataLength = postData.length;
         HttpURLConnection conn = null;
@@ -112,6 +115,8 @@ public class OnlineDBDownloader {
     }
 
     public void getFacebookData() {
+        sharedPreferences = context.getSharedPreferences("TML", Context.MODE_PRIVATE);
+        editor = sharedPreferences.edit();
         HttpURLConnection conn = null;
         try {
             URL url = new URL(fbLink);
@@ -120,9 +125,13 @@ public class OnlineDBDownloader {
             conn.setConnectTimeout(150000);
             conn.setRequestMethod("GET");
             conn.connect();
+            editor.remove("nw_status");
+            editor.apply();
             fbObject = new JSONObject(convertStreamToString(conn.getInputStream()));
         } catch (IOException e) {
             e.printStackTrace();
+            editor.putString("nw_status", "bad");
+            editor.apply();
         } catch (JSONException e) {
             e.printStackTrace();
         } finally {
@@ -139,8 +148,8 @@ public class OnlineDBDownloader {
         try {
             URL url = new URL(userDetailsLink);
             conn = (HttpURLConnection) url.openConnection();
-            conn.setReadTimeout(5000);
-            conn.setConnectTimeout(5000);
+            conn.setReadTimeout(500000);
+            conn.setConnectTimeout(500000);
             conn.setRequestMethod("POST");
             conn.setDoInput(true);
             conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
@@ -171,6 +180,9 @@ public class OnlineDBDownloader {
     }
 
     public void submitNewUserData(String fullName, String emailID, String phone, String year, String branch, String college, String division, String rollNO) {
+        sharedPreferences = context.getSharedPreferences("TML", Context.MODE_PRIVATE);
+        editor = sharedPreferences.edit();
+
         String parameters = "uName=" + fullName + "&" + "uEmail=" + emailID + "&" + "uPhone=" + phone + "&" + "uYear=" + year + "&" + "uBranch=" + branch + "&" + "uCollege=" + college + "&" + "uDivision=" + division + "&" + "uRoll=" + rollNO;
         byte[] postData = parameters.getBytes(Charset.forName("UTF-8"));
         int postDataLength = postData.length;
@@ -189,9 +201,9 @@ public class OnlineDBDownloader {
             OutputStreamWriter writer = new OutputStreamWriter(conn.getOutputStream());
             writer.write(parameters);
             writer.flush();
+            editor.putString("uID", convertStreamToString(conn.getInputStream()));
+            editor.apply();
             writer.close();
-        } catch (SocketException e) {
-
         } catch (IOException e) {
 
         } finally {

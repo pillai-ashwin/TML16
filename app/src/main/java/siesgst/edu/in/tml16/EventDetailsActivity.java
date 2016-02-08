@@ -1,9 +1,12 @@
 package siesgst.edu.in.tml16;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -13,16 +16,24 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
 import siesgst.edu.in.tml16.fragments.RegistrationFragment;
+import siesgst.edu.in.tml16.utils.ConnectionUtils;
 import siesgst.edu.in.tml16.utils.LocalDBHandler;
+import siesgst.edu.in.tml16.utils.OnlineDBDownloader;
 
 public class EventDetailsActivity extends AppCompatActivity {
 
     TextView description, eventDay, venue, head1, head2;
     ImageView iconHead1, iconHead2;
+
+    String eventName;
+
+    ProgressDialog progressDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,7 +41,7 @@ public class EventDetailsActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        String eventName = getIntent().getExtras().getString("event_name");
+        eventName = getIntent().getExtras().getString("event_name");
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -84,9 +95,8 @@ public class EventDetailsActivity extends AppCompatActivity {
         alertDialog.setPositiveButton("YES", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                Intent intent = new Intent(EventDetailsActivity.this, HomeActivity.class);
-                intent.putExtra("reg_click", true);
-                startActivity(intent);
+                progressDialog = ProgressDialog.show(EventDetailsActivity.this, "Registering", "Please wait...");
+                new SmartRegister().execute();
             }
         });
         alertDialog.setNegativeButton("NO", new DialogInterface.OnClickListener() {
@@ -97,5 +107,46 @@ public class EventDetailsActivity extends AppCompatActivity {
         });
         alertDialog.create();
         alertDialog.show();
+    }
+
+    private class SmartRegister extends AsyncTask<Void, Void, Void> {
+
+        SharedPreferences sharedPreferences;
+        SharedPreferences.Editor editor;
+        OnlineDBDownloader onlineDBDownloader;
+
+        @Override
+        protected void onPreExecute() {
+            sharedPreferences = getSharedPreferences("TML", MODE_PRIVATE);
+            onlineDBDownloader = new OnlineDBDownloader(EventDetailsActivity.this);
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            if ((new ConnectionUtils(EventDetailsActivity.this).checkConnection())) {
+                onlineDBDownloader.submitRegData(sharedPreferences.getString("username", ""), sharedPreferences.getString("email", ""), sharedPreferences.getString("uPhone", ""), sharedPreferences.getString("uYear", ""), sharedPreferences.getString("uBranch", ""), sharedPreferences.getString("uCollege", ""), sharedPreferences.getString("uDivision", ""), sharedPreferences.getString("uRoll", ""), eventName);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(EventDetailsActivity.this, sharedPreferences.getString("reg_status", ""), Toast.LENGTH_LONG).show();
+                        progressDialog.dismiss();
+                    }
+                });
+            } else {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(EventDetailsActivity.this, "Please check your internet connection..", Toast.LENGTH_SHORT).show();
+                        progressDialog.dismiss();
+                    }
+                });
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+        }
     }
 }

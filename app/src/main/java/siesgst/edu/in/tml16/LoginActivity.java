@@ -36,6 +36,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import siesgst.edu.in.tml16.utils.ConnectionUtils;
+import siesgst.edu.in.tml16.utils.DataHandler;
+import siesgst.edu.in.tml16.utils.LocalDBHandler;
 import siesgst.edu.in.tml16.utils.OnlineDBDownloader;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
@@ -100,10 +102,12 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         mGooleplus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                progressDialog = ProgressDialog.show(LoginActivity.this, "", "Loading...");
                 if ((new ConnectionUtils(LoginActivity.this)).checkConnection()) {
                     signIn();
                 } else {
                     Toast.makeText(LoginActivity.this, "Error Signing in.\nPlease check your internet connection or try again.", Toast.LENGTH_SHORT).show();
+                    progressDialog.dismiss();
                 }
             }
         });
@@ -116,7 +120,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     }
 
     private void signIn() {
-        progressDialog = ProgressDialog.show(this, "", "Loading...");
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
         startActivityForResult(signInIntent, 0);
     }
@@ -156,12 +159,14 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             new UserDetailDownload().execute(acct.getEmail());
         } else {
             Toast.makeText(LoginActivity.this, "Error Signing in.\nPlease check your internet connection or try again.", Toast.LENGTH_SHORT).show();
+            progressDialog.dismiss();
         }
     }
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
         Toast.makeText(LoginActivity.this, "Error Signing in.\nPlease check your internet connection or try again.", Toast.LENGTH_SHORT).show();
+        progressDialog.dismiss();
     }
 
     @Override
@@ -189,6 +194,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         SharedPreferences sharedPreferences;
         SharedPreferences.Editor editor;
 
+        boolean status;
 
         OnlineDBDownloader downloader;
 
@@ -198,8 +204,11 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             sharedPreferences = getSharedPreferences("TML", MODE_PRIVATE);
             editor = sharedPreferences.edit();
             downloader.sendUserEmail(params[0]);
-            if (downloader.getUserStatus()) {
+            status = downloader.getUserStatus();
+            if (status) {
                 userArray = downloader.getUserDetailsArray();
+                eventArray = downloader.getRegEventDetailsArray();
+                new DataHandler(LoginActivity.this).pushRegEvents(eventArray);
                 userDetailsObject = userArray.optJSONObject(0);
                 editor.putString("uID", userDetailsObject.optString("uID"));
                 editor.putString("uPhone", userDetailsObject.optString("uPhone"));
@@ -215,7 +224,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
         @Override
         protected void onPostExecute(Void v) {
-            if (downloader.getUserStatus()) {
+            if (status) {
                 setFinalCall(i, true);
             } else {
                 setContentView(R.layout.user_details);
@@ -227,10 +236,10 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                 division = (EditText) findViewById(R.id.div);
                 rollNO = (EditText) findViewById(R.id.roll_no);
                 college = (AutoCompleteTextView) findViewById(R.id.college);
-                String[] colleges = {"Thakur College", "TSEC", "VJTI", "Kalsekar College", "LT College", "Saboo Siddik", "Vidkyalankar", "Xaviers", "TS Chanakya", "Datta Meghe", "Indira Gandhi", "Vasant Dada Patil", "Watumull", "Saraswati", "KC College", "Pillai", "RAIT", "Fr. Agnel", "VESIT", "KJ Somaiya", "MGM Khedkar", "Bharti Vidyapeeth", "Shah and Anchor", "DJ Sanghvi", "RGIT", "AC Patil", "Sardar Patil", "Rizvi", "RA Podar", "DY Patil, Belapur", "Dr. KTV Reddy", "Terna", "Don Bosco", "SIES Graduate School of Technology", "Other" };
+                String[] colleges = {"Thakur College", "TSEC", "VJTI", "Kalsekar College", "LT College", "Saboo Siddik", "Vidkyalankar", "Xaviers", "TS Chanakya", "Datta Meghe", "Indira Gandhi", "Vasant Dada Patil", "Watumull", "Saraswati", "KC College", "Pillai", "RAIT", "Fr. Agnel", "VESIT", "KJ Somaiya", "MGM Khedkar", "Bharti Vidyapeeth", "Shah and Anchor", "DJ Sanghvi", "RGIT", "AC Patil", "Sardar Patil", "Rizvi", "RA Podar", "DY Patil, Belapur", "Dr. KTV Reddy", "Terna", "Don Bosco", "SIES Graduate School of Technology", "Other"};
 
                 ArrayAdapter<String> adapter = new ArrayAdapter<String>
-                        (LoginActivity.this,android.R.layout.select_dialog_item, colleges);
+                        (LoginActivity.this, android.R.layout.select_dialog_item, colleges);
                 college.setAdapter(adapter);
 
                 Spinner spinnerYear = (Spinner) findViewById(R.id.spinner_year);

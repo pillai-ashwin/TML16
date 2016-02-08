@@ -1,6 +1,7 @@
 package siesgst.edu.in.tml16.adapters;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +14,7 @@ import java.util.List;
 
 import siesgst.edu.in.tml16.R;
 import siesgst.edu.in.tml16.helpers.FeedEvents;
+import siesgst.edu.in.tml16.helpers.FeedNews;
 import siesgst.edu.in.tml16.utils.LocalDBHandler;
 
 /**
@@ -21,17 +23,16 @@ import siesgst.edu.in.tml16.utils.LocalDBHandler;
 public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> {
     List<FeedEvents> feedEventsList;
     Context context;
+    FeedEvents feedEvents;
+
+    String category, subCategory;
 
     public EventAdapter(Context context, String category, String subCategory) {
         this.context = context;
-        feedEventsList = new ArrayList<>();
+        this.category = category;
+        this.subCategory = subCategory;
+        new LoadAdapterData().execute();
 
-        for (int i = 0; i < ((new LocalDBHandler(context)).getEventNamesAndDay(category, subCategory)).size() - 1; i = i +2) {
-            FeedEvents feedEvents = new FeedEvents();
-            feedEvents.setEventName((new LocalDBHandler(context)).getEventNamesAndDay(category, subCategory).get(i) );
-            feedEvents.setEventDay((new LocalDBHandler(context)).getEventNamesAndDay(category, subCategory).get(i + 1));
-            feedEventsList.add(feedEvents);
-        }
     }
 
     @Override
@@ -69,5 +70,31 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
     @Override
     public int getItemCount() {
         return feedEventsList.size();
+    }
+
+    private class LoadAdapterData extends AsyncTask<Void, Void, Void> {
+        LocalDBHandler localDBHandler;
+
+        @Override
+        protected void onPreExecute() {
+            localDBHandler = new LocalDBHandler(context);
+            feedEventsList = new ArrayList<>();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            for (int i = 0; i < ((new LocalDBHandler(context)).getEventNamesAndDay(category, subCategory)).size() - 1; i = i + 2) {
+                    feedEvents = new FeedEvents();
+                    feedEvents.setEventName((new LocalDBHandler(context)).getEventNamesAndDay(category, subCategory).get(i));
+                    feedEvents.setEventDay((new LocalDBHandler(context)).getEventNamesAndDay(category, subCategory).get(i + 1));
+                    feedEventsList.add(feedEvents);
+                }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            notifyDataSetChanged();
+        }
     }
 }
