@@ -168,7 +168,7 @@ public class RegistrationFragment extends Fragment implements Validator.Validati
                             getActivity().runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    Toast.makeText(getActivity(), sharedPreferences.getString("reg_status", ""), Toast.LENGTH_LONG).show();
+                                    Toast.makeText(getActivity(), sharedPreferences.getString("reg_status", "") + " \nComplete your payment at the registration desk.", Toast.LENGTH_LONG).show();
                                     progressDialog.dismiss();
                                     //Snackbar.make(v, sharedPreferences.getString("reg_status", ""), Snackbar.LENGTH_SHORT).show();
                                 }

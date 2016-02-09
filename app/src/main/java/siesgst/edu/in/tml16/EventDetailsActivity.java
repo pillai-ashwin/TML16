@@ -128,7 +128,7 @@ public class EventDetailsActivity extends AppCompatActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(EventDetailsActivity.this, sharedPreferences.getString("reg_status", ""), Toast.LENGTH_LONG).show();
+                            Toast.makeText(EventDetailsActivity.this, sharedPreferences.getString("reg_status", "") + " \nComplete your payment at the registration desk.", Toast.LENGTH_LONG).show();
                             progressDialog.dismiss();
                         }
                     });

@@ -58,6 +58,8 @@ public class OnlineDBDownloader {
             conn.setRequestMethod("POST");
             conn.setDoInput(true);
             conn.connect();
+            editor.remove("nw_status");
+            editor.apply();
             JSONObject object = new JSONObject(convertStreamToString(conn.getInputStream()));
             JSON = object.optJSONArray("events");
         } catch (IOException e) {

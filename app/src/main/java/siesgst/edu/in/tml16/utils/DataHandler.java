@@ -30,23 +30,27 @@ public class DataHandler {
 
     public void pushEvents(JSONArray array) {
         JSONObject object;
-        for (int i = 0; i < array.length(); i++) {
-            object = array.optJSONObject(i);
-            String[] data = new String[12];
-            data[0] = object.optString("eName");
-            data[1] = object.optString("eDay");
-            data[2] = object.optString("eVenue");
-            data[3] = object.optString("eCategory");
-            data[4] = object.optString("eSubCategory");
-            data[5] = object.optString("eDetails");
-            data[6] = object.optString("eHead1");
-            data[7] = object.optString("ePhone1");
-            data[8] = object.optString("eHead2");
-            data[9] = object.optString("ePhone2");
-            data[10] = object.optString("eCreated");
-            data[11] = object.optString("eModified");
+        try {
+            for (int i = 0; i < array.length(); i++) {
+                object = array.optJSONObject(i);
+                String[] data = new String[12];
+                data[0] = object.optString("eName");
+                data[1] = object.optString("eDay");
+                data[2] = object.optString("eVenue");
+                data[3] = object.optString("eCategory");
+                data[4] = object.optString("eSubCategory");
+                data[5] = object.optString("eDetails");
+                data[6] = object.optString("eHead1");
+                data[7] = object.optString("ePhone1");
+                data[8] = object.optString("eHead2");
+                data[9] = object.optString("ePhone2");
+                data[10] = object.optString("eCreated");
+                data[11] = object.optString("eModified");
 
-            new LocalDBHandler(context).insertEventData(data);
+                new LocalDBHandler(context).insertEventData(data);
+            }
+        } catch (NullPointerException e) {
+
         }
     }
 
@@ -75,7 +79,11 @@ public class DataHandler {
                 data[4] = "0";
             }
 
-            new LocalDBHandler(context).insertFBData(data);
+            try {
+                new LocalDBHandler(context).insertFBData(data);
+            } catch (NullPointerException e) {
+
+            }
         }
     }
 

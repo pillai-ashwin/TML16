@@ -67,15 +67,8 @@ public class TatvaEventsFragment extends Fragment {
             }
         });
 
-        ItemClickSupport.addTo(recyclerView).setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
-            @Override
-            public void onItemClicked(RecyclerView recyclerView, int position, View v) {
-                TextView eventName = (TextView) v.findViewById(R.id.event_name);
-                Intent intent = new Intent(getActivity(), EventDetailsActivity.class);
-                intent.putExtra("event_name", eventName.getText());
-                startActivity(intent);
-            }
-        });
+        addClickSupport();
+
         return view;
     }
 
@@ -85,6 +78,7 @@ public class TatvaEventsFragment extends Fragment {
 
         @Override
         protected void onPreExecute() {
+            removeClickSupport();
             if (new ConnectionUtils(getActivity()).checkConnection()) {
                 new LocalDBHandler(getActivity()).dropEventsTable();
             } else {
@@ -121,11 +115,33 @@ public class TatvaEventsFragment extends Fragment {
             adapter = new EventAdapter(getActivity(), "Tatva", null);
             recyclerView.setAdapter(adapter);
             swipeRefreshLayout.setRefreshing(false);
+            addClickSupport();
         }
     }
 
     public void onRefreshData() {
         swipeRefreshLayout.setRefreshing(true);
         new EventListDownload().execute();
+    }
+
+    public void removeClickSupport() {
+       ItemClickSupport.addTo(recyclerView).setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
+           @Override
+           public void onItemClicked(RecyclerView recyclerView, int position, View v) {
+
+           }
+       }) ;
+    }
+
+    public void addClickSupport() {
+        ItemClickSupport.addTo(recyclerView).setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
+            @Override
+            public void onItemClicked(RecyclerView recyclerView, int position, View v) {
+                TextView eventName = (TextView) v.findViewById(R.id.event_name);
+                Intent intent = new Intent(getActivity(), EventDetailsActivity.class);
+                intent.putExtra("event_name", eventName.getText());
+                startActivity(intent);
+            }
+        });
     }
 }
