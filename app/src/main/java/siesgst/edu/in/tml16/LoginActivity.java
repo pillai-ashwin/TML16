@@ -4,14 +4,11 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatButton;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -37,7 +34,6 @@ import org.json.JSONObject;
 
 import siesgst.edu.in.tml16.utils.ConnectionUtils;
 import siesgst.edu.in.tml16.utils.DataHandler;
-import siesgst.edu.in.tml16.utils.LocalDBHandler;
 import siesgst.edu.in.tml16.utils.OnlineDBDownloader;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 

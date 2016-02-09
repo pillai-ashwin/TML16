@@ -6,10 +6,11 @@
         <item
             android:id="@+id/news"
             android:icon="@mipmap/ic_import_contacts_black_24dp"
-            android:title="News" />
+            android:title="News"
+            android:checkable="false"/>
     </group>
 
-    <item android:title="Events">
+    <item android:title="Events" android:id="@+id/core_event">
         <menu>
             <item
                 android:id="@+id/tatva"
@@ -33,7 +34,7 @@
         <item
             android:id="@+id/register"
             android:icon="@mipmap/ic_content_paste_black_24dp"
-            android:title="Register"/>
+            android:title="Register for a friend"/>
         <item
             android:id="@+id/profile"
             android:icon="@mipmap/ic_face_black_24dp"

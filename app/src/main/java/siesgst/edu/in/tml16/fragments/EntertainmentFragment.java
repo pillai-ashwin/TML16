@@ -38,8 +38,6 @@ public class EntertainmentFragment extends Fragment {
     private RecyclerView recyclerView;
     private EventAdapter adapter;
 
-    ProgressDialog progressDialog;
-
     CoordinatorLayout layout;
     SwipeRefreshLayout swipeRefreshLayout;
 

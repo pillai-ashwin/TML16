@@ -1,14 +1,12 @@
 package siesgst.edu.in.tml16.adapters;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Handler;
 import android.support.v7.widget.AppCompatButton;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,6 +32,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
     FeedNews feedNews;
 
     public NewsAdapter(Context context) {
+        feedNewsList = new ArrayList<>();
         this.context = context;
         new LoadAdapterData().execute();
     }
@@ -108,6 +107,12 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
                 readMore(viewHolder.postLink);
             }
         });
+        viewHolder.cardView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                readMore(viewHolder.postLink);
+            }
+        });
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
@@ -120,6 +125,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
         protected TextView comments;
         protected ImageView iconLikes;
         protected ImageView iconComments;
+        protected CardView cardView;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -133,6 +139,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
             comments = (TextView) itemView.findViewById(R.id.comments);
             iconLikes = (ImageView) itemView.findViewById(R.id.icon_likes);
             iconComments = (ImageView) itemView.findViewById(R.id.icon_comments);
+            cardView = (CardView) itemView.findViewById(R.id.card_view);
         }
     }
 
@@ -161,7 +168,6 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
 
         @Override
         protected Void doInBackground(Void... params) {
-            feedNewsList = new ArrayList<>();
                 for (int i = 0; i < (localDBHandler.getFBData().size()) - 4; i = i + 5) {
                     feedNews = new FeedNews();
                     feedNews.setPostMessage(localDBHandler.getFBData().get(i));

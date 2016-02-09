@@ -1,12 +1,8 @@
 package siesgst.edu.in.tml16;
 
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -31,7 +27,6 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -58,9 +53,15 @@ public class HomeActivity extends AppCompatActivity
 
     private Menu menu;
 
+    CharSequence title;
     private GoogleApiClient mGoogleApiClient;
 
     final private String dbVersion = "DB_VERSION";
+
+    private static final int TIME_INTERVAL = 2000;
+    private long mBackPressed;
+
+    DrawerLayout drawer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,7 +98,7 @@ public class HomeActivity extends AppCompatActivity
             Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
             setSupportActionBar(toolbar);
 
-            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+            drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
             ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                     this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
             drawer.setDrawerListener(toggle);
@@ -142,7 +143,14 @@ public class HomeActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+        if (mBackPressed + TIME_INTERVAL > System.currentTimeMillis())
+        {
+            super.onBackPressed();
+            return;
+        }
+        else { Toast.makeText(getBaseContext(), "Press back again to exit", Toast.LENGTH_SHORT).show(); }
+
+        mBackPressed = System.currentTimeMillis();
     }
 
 
@@ -237,6 +245,8 @@ public class HomeActivity extends AppCompatActivity
                         getSupportFragmentManager().beginTransaction()
                                 .replace(R.id.root_frame, new TatvaEventsFragment())
                                 .commit();
+                        setTitle("Tatva");
+                        title = "Tatva";
                     }
                 }, 300);
                 break;
@@ -247,6 +257,8 @@ public class HomeActivity extends AppCompatActivity
                         getSupportFragmentManager().beginTransaction()
                                 .replace(R.id.root_frame, new MokshTabFragment())
                                 .commit();
+                        setTitle("Moksh");
+                        title = "Moksh";
                     }
                 }, 300);
                 break;
@@ -257,6 +269,8 @@ public class HomeActivity extends AppCompatActivity
                         getSupportFragmentManager().beginTransaction()
                                 .replace(R.id.root_frame, new LakshyaEventsFragment())
                                 .commit();
+                        setTitle("Lakshya");
+                        title = "Lakshya";
                     }
                 }, 300);
                 break;
@@ -267,6 +281,8 @@ public class HomeActivity extends AppCompatActivity
                         getSupportFragmentManager().beginTransaction()
                                 .replace(R.id.root_frame, new NewsFragment())
                                 .commit();
+                        setTitle("News");
+                        title = "News";
                     }
                 }, 300);
                 break;
@@ -281,12 +297,12 @@ public class HomeActivity extends AppCompatActivity
                         getSupportFragmentManager().beginTransaction()
                                 .replace(R.id.root_frame, new RegistrationFragment())
                                 .commit();
+                        setTitle("Register");
+                        title = "Register";
                     }
                 }, 300);
                 break;
         }
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }

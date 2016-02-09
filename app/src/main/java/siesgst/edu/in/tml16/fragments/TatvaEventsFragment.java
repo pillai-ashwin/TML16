@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -16,20 +15,14 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.util.List;
 
 import siesgst.edu.in.tml16.EventDetailsActivity;
-import siesgst.edu.in.tml16.HomeActivity;
 import siesgst.edu.in.tml16.R;
 import siesgst.edu.in.tml16.adapters.EventAdapter;
-import siesgst.edu.in.tml16.helpers.FeedEvents;
 import siesgst.edu.in.tml16.helpers.ItemClickSupport;
 import siesgst.edu.in.tml16.utils.ConnectionUtils;
 import siesgst.edu.in.tml16.utils.DataHandler;

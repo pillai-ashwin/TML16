@@ -17,14 +17,10 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
-import com.sromku.simple.fb.entities.Privacy;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import siesgst.edu.in.tml16.R;
@@ -55,6 +51,7 @@ public class NewsFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_news, container, false);
 
+        layout = (CoordinatorLayout) view.findViewById(R.id.news_layout);
         recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
@@ -85,12 +82,12 @@ public class NewsFragment extends Fragment {
             if (new ConnectionUtils(getActivity()).checkConnection()) {
                 new LocalDBHandler(getActivity()).dropFBTable();
             } else {
-                /*Snackbar.make(layout, "Can't connect to network..", Snackbar.LENGTH_INDEFINITE).setAction("Try Again", new View.OnClickListener() {
+                Snackbar.make(layout, "Can't connect to network..", Snackbar.LENGTH_INDEFINITE).setAction("Try Again", new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         onRefreshData();
                     }
-                }).show();*/
+                }).show();
             }
         }
 

@@ -28,7 +28,7 @@
                 android:id="@+id/event_icon"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
-                android:src="@mipmap/icon"
+                android:src="@mipmap/ic_launcher"
                 card_view:civ_border_color="@color/colorAccent"
                 card_view:civ_border_width="1dp" />
 

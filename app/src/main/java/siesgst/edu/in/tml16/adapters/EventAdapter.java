@@ -14,7 +14,6 @@ import java.util.List;
 
 import siesgst.edu.in.tml16.R;
 import siesgst.edu.in.tml16.helpers.FeedEvents;
-import siesgst.edu.in.tml16.helpers.FeedNews;
 import siesgst.edu.in.tml16.utils.LocalDBHandler;
 
 /**
