@@ -1,25 +1,20 @@
 package siesgst.edu.in.tml16.fragments;
 
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
-
-import com.squareup.picasso.Picasso;
 
 import org.json.JSONObject;
 
@@ -76,9 +71,11 @@ public class NewsFragment extends Fragment {
 
     private class FBDataDownload extends AsyncTask<Void, Void, JSONObject> {
         JSONObject object;
+        SharedPreferences sharedPreferences;
 
         @Override
         protected void onPreExecute() {
+            sharedPreferences = getActivity().getSharedPreferences("TML", Context.MODE_PRIVATE);
             if (new ConnectionUtils(getActivity()).checkConnection()) {
                 new LocalDBHandler(getActivity()).dropFBTable();
             } else {
@@ -93,19 +90,22 @@ public class NewsFragment extends Fragment {
 
         @Override
         protected JSONObject doInBackground(Void... params) {
-            SharedPreferences sharedPreferences = getActivity().getSharedPreferences("TML", Context.MODE_PRIVATE);
             OnlineDBDownloader downloader = new OnlineDBDownloader(getActivity());
             downloader.getFacebookData();
             object = downloader.getFBObject();
             if (!sharedPreferences.getString("nw_status", "").equals("bad")) {
                 new DataHandler(getActivity()).pushFBData(object);
             } else {
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(getActivity(), "Check your internet connection...", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                try {
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getActivity(), "Check your internet connection...", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                } catch (NullPointerException e) {
+
+                }
             }
             return object;
         }

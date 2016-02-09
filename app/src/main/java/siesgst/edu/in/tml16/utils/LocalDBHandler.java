@@ -294,19 +294,18 @@ public class LocalDBHandler extends SQLiteOpenHelper {
     }
 
     public ArrayList<String> getFBData() {
-        SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = db.query(FB_DATA_TABLE, new String[]{F_MESSAGE, F_PICTURE, F_LINK, F_LIKES, F_COMMENTS}, null, null, null, null, null);
-        ArrayList<String> arrayList = new ArrayList<>();
-        for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
-            arrayList.add(cursor.getString(cursor.getColumnIndex(F_MESSAGE)));
-            arrayList.add(cursor.getString(cursor.getColumnIndex(F_PICTURE)));
-            arrayList.add(cursor.getString(cursor.getColumnIndex(F_LINK)));
-            arrayList.add(cursor.getString(cursor.getColumnIndex(F_LIKES)));
-            arrayList.add(cursor.getString(cursor.getColumnIndex(F_COMMENTS)));
-        }
-        cursor.close();
-        db.close();
-
+            SQLiteDatabase db = getReadableDatabase();
+            Cursor cursor = db.query(FB_DATA_TABLE, new String[]{F_MESSAGE, F_PICTURE, F_LINK, F_LIKES, F_COMMENTS}, null, null, null, null, null);
+            ArrayList<String> arrayList = new ArrayList<>();
+            for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+                arrayList.add(cursor.getString(cursor.getColumnIndex(F_MESSAGE)));
+                arrayList.add(cursor.getString(cursor.getColumnIndex(F_PICTURE)));
+                arrayList.add(cursor.getString(cursor.getColumnIndex(F_LINK)));
+                arrayList.add(cursor.getString(cursor.getColumnIndex(F_LIKES)));
+                arrayList.add(cursor.getString(cursor.getColumnIndex(F_COMMENTS)));
+            }
+            cursor.close();
+            db.close();
         return arrayList;
     }
 

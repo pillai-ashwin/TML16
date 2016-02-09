@@ -322,7 +322,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(LoginActivity.this, "Data Saved...", Toast.LENGTH_LONG).show();
+                        Toast.makeText(LoginActivity.this, "Welcome to Tatva Moksh Lakshya", Toast.LENGTH_LONG).show();
                     }
                 });
 

@@ -220,6 +220,7 @@ public class HomeActivity extends AppCompatActivity
                         startActivityForResult(new Intent(HomeActivity.this, LoginActivity.class), 0);
                     }
                 }, 300);
+                finish();
                 break;
             case R.id.sign_out:
                 new Handler().postDelayed(new Runnable() {
@@ -228,7 +229,7 @@ public class HomeActivity extends AppCompatActivity
                         signOut();
                     }
                 }, 300);
-
+                finish();
                 break;
             case R.id.profile:
                 new Handler().postDelayed(new Runnable() {
@@ -327,6 +328,7 @@ public class HomeActivity extends AppCompatActivity
 
     public void setUpFirstTimeLogin() {
         if (new ConnectionUtils(this).checkConnection()) {
+            new LocalDBHandler(HomeActivity.this).wapasTableBana();
             new FBDataDownload().execute();
             new EventListDownload().execute();
         } else {

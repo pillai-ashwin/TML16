@@ -85,7 +85,11 @@ public class RegistrationFragment extends Fragment implements Validator.Validati
         sharedPreferences = getActivity().getSharedPreferences("TML", Context.MODE_PRIVATE);
 
         college = (AutoCompleteTextView) view.findViewById(R.id.college);
-        college.setText("SIES Graduate School of Technology");
+        String[] colleges = {"Thakur College", "TSEC", "VJTI", "Kalsekar College", "LT College", "Saboo Siddik", "Vidkyalankar", "Xaviers", "TS Chanakya", "Datta Meghe", "Indira Gandhi", "Vasant Dada Patil", "Watumull", "Saraswati", "KC College", "Pillai", "RAIT", "Fr. Agnel", "VESIT", "KJ Somaiya", "MGM Khedkar", "Bharti Vidyapeeth", "Shah and Anchor", "DJ Sanghvi", "RGIT", "AC Patil", "Sardar Patil", "Rizvi", "RA Podar", "DY Patil, Belapur", "Dr. KTV Reddy", "Terna", "Don Bosco", "SIES Graduate School of Technology", "Other"};
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>
+                (getActivity(), android.R.layout.select_dialog_item, colleges);
+        college.setAdapter(adapter);
 
 
         Spinner spinnerYear = (Spinner) view.findViewById(R.id.spinner_year);

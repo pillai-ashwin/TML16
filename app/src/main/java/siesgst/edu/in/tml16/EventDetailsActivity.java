@@ -123,14 +123,24 @@ public class EventDetailsActivity extends AppCompatActivity {
         @Override
         protected Void doInBackground(Void... params) {
             if ((new ConnectionUtils(EventDetailsActivity.this).checkConnection())) {
-                onlineDBDownloader.submitRegData(sharedPreferences.getString("username", ""), sharedPreferences.getString("email", ""), sharedPreferences.getString("uPhone", ""), sharedPreferences.getString("uYear", ""), sharedPreferences.getString("uBranch", ""), sharedPreferences.getString("uCollege", ""), sharedPreferences.getString("uDivision", ""), sharedPreferences.getString("uRoll", ""), eventName);
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(EventDetailsActivity.this, sharedPreferences.getString("reg_status", ""), Toast.LENGTH_LONG).show();
-                        progressDialog.dismiss();
-                    }
-                });
+                if (!(sharedPreferences.getInt("login_status", 0) == 1)) {
+                    onlineDBDownloader.submitRegData(sharedPreferences.getString("username", ""), sharedPreferences.getString("email", ""), sharedPreferences.getString("uPhone", ""), sharedPreferences.getString("uYear", ""), sharedPreferences.getString("uBranch", ""), sharedPreferences.getString("uCollege", ""), sharedPreferences.getString("uDivision", ""), sharedPreferences.getString("uRoll", ""), eventName);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(EventDetailsActivity.this, sharedPreferences.getString("reg_status", ""), Toast.LENGTH_LONG).show();
+                            progressDialog.dismiss();
+                        }
+                    });
+            } else {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(EventDetailsActivity.this, "You need to sign in to register for this event.", Toast.LENGTH_LONG).show();
+                            progressDialog.dismiss();
+                        }
+                    });
+                }
             } else {
                 runOnUiThread(new Runnable() {
                     @Override

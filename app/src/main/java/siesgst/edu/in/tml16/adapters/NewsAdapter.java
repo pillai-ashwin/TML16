@@ -168,6 +168,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
 
         @Override
         protected Void doInBackground(Void... params) {
+            try {
                 for (int i = 0; i < (localDBHandler.getFBData().size()) - 4; i = i + 5) {
                     feedNews = new FeedNews();
                     feedNews.setPostMessage(localDBHandler.getFBData().get(i));
@@ -177,6 +178,9 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
                     feedNews.setNoOfComments(localDBHandler.getFBData().get(i + 4));
                     feedNewsList.add(feedNews);
                 }
+            } catch (NullPointerException e) {
+
+            }
             return null;
         }
 
@@ -184,7 +188,5 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
         protected void onPostExecute(Void aVoid) {
             notifyDataSetChanged();
         }
-
-
     }
 }

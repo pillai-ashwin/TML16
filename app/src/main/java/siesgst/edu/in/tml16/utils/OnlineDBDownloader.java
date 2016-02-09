@@ -141,6 +141,8 @@ public class OnlineDBDownloader {
     }
 
     public void sendUserEmail(String email) {
+        sharedPreferences = context.getSharedPreferences("TML", Context.MODE_PRIVATE);
+        editor = sharedPreferences.edit();
         String parameters = "uEmail=" + email;
         byte[] postData = parameters.getBytes(Charset.forName("UTF-8"));
         int postDataLength = postData.length;
@@ -167,6 +169,8 @@ public class OnlineDBDownloader {
                 regEventDetailsArray = object.optJSONArray("event_details");
             } else {
                 userExists = false;
+                editor.putString("welcome", convertStreamToString(conn.getInputStream()));
+                editor.apply();
             }
             writer.close();
         } catch (IOException e) {
