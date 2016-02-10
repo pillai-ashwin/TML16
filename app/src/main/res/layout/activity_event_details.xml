@@ -23,11 +23,11 @@
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
             <ImageView
+                android:id="@+id/detail_image"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:minHeight="100dp"
                 android:scaleType="centerCrop"
-                android:src="@drawable/cheese"
                 app:layout_collapseMode="parallax"
                 app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed" />
 

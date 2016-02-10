@@ -16,9 +16,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
+
 import org.json.JSONObject;
 
 import siesgst.edu.in.tml16.R;
+import siesgst.edu.in.tml16.TMLApplication;
 import siesgst.edu.in.tml16.adapters.NewsAdapter;
 import siesgst.edu.in.tml16.utils.ConnectionUtils;
 import siesgst.edu.in.tml16.utils.DataHandler;
@@ -35,10 +39,11 @@ public class NewsFragment extends Fragment {
     SwipeRefreshLayout swipeRefreshLayout;
 
     CoordinatorLayout layout;
+
+    Tracker mTracker;
     public NewsFragment() {
         // Required empty public constructor
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -60,6 +65,12 @@ public class NewsFragment extends Fragment {
         });
 
         onRefreshData();
+
+        TMLApplication application = (TMLApplication) getActivity().getApplication();
+        mTracker = application.getDefaultTracker();
+
+        mTracker.setScreenName("News");
+        mTracker.send(new HitBuilders.ScreenViewBuilder().build());
 
         return view;
     }
@@ -116,5 +127,12 @@ public class NewsFragment extends Fragment {
             recyclerView.setAdapter(newsAdapter);
             swipeRefreshLayout.setRefreshing(false);
         }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mTracker.setScreenName("News");
+        mTracker.send(new HitBuilders.ScreenViewBuilder().build());
     }
 }

@@ -17,6 +17,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
@@ -39,6 +41,8 @@ public class ProfileActivity extends PreferenceActivity {
 
     PreferenceScreen preferenceScreen;
     PreferenceCategory preferenceCategory;
+
+    Tracker mTracker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,6 +109,12 @@ public class ProfileActivity extends PreferenceActivity {
 
         ListView listView = getListView();
         listView.addHeaderView(profile);
+
+        TMLApplication application = (TMLApplication) getApplication();
+        mTracker = application.getDefaultTracker();
+
+        mTracker.setScreenName("Profile");
+        mTracker.send(new HitBuilders.ScreenViewBuilder().build());
     }
 
     public void launchQR() {
@@ -192,5 +202,12 @@ public class ProfileActivity extends PreferenceActivity {
         protected void onPostExecute(Void aVoid) {
             swipeRefreshLayout.setRefreshing(false);
         }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mTracker.setScreenName("Profile");
+        mTracker.send(new HitBuilders.ScreenViewBuilder().build());
     }
 }

@@ -22,12 +22,19 @@
             "package_name": "siesgst.edu.in.tml16",
             "certificate_hash": "9008136906AE4EF0E730D03DC0E57E9A1B0B33C8"
           }
+        },
+        {
+          "client_id": "914076775620-dfmpnrii23090k92rsq78m5j69di617o.apps.googleusercontent.com",
+          "client_type": 3
         }
       ],
       "api_key": [],
       "services": {
         "analytics_service": {
-          "status": 1
+          "status": 2,
+          "analytics_property": {
+            "tracking_id": "UA-73612733-1"
+          }
         },
         "cloud_messaging_service": {
           "status": 1,

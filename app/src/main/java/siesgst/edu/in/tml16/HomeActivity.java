@@ -16,10 +16,12 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.analytics.Tracker;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.ConnectionResult;
@@ -76,6 +78,7 @@ public class HomeActivity extends AppCompatActivity
                 .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
+
 
         sharedPreferences = getSharedPreferences("TML", MODE_PRIVATE);
 
@@ -220,7 +223,6 @@ public class HomeActivity extends AppCompatActivity
                         startActivityForResult(new Intent(HomeActivity.this, LoginActivity.class), 0);
                     }
                 }, 300);
-                finish();
                 break;
             case R.id.sign_out:
                 new Handler().postDelayed(new Runnable() {
@@ -229,7 +231,6 @@ public class HomeActivity extends AppCompatActivity
                         signOut();
                     }
                 }, 300);
-                finish();
                 break;
             case R.id.profile:
                 new Handler().postDelayed(new Runnable() {
@@ -276,6 +277,7 @@ public class HomeActivity extends AppCompatActivity
                 }, 300);
                 break;
             case R.id.news:
+                Toast.makeText(HomeActivity.this, "Loading...", Toast.LENGTH_SHORT).show();
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {

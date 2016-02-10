@@ -18,6 +18,8 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 import com.mobsandgeeks.saripaar.Rule;
 import com.mobsandgeeks.saripaar.Validator;
 import com.mobsandgeeks.saripaar.annotation.Email;
@@ -26,6 +28,7 @@ import com.mobsandgeeks.saripaar.annotation.Required;
 import com.mobsandgeeks.saripaar.annotation.TextRule;
 
 import siesgst.edu.in.tml16.R;
+import siesgst.edu.in.tml16.TMLApplication;
 import siesgst.edu.in.tml16.utils.ConnectionUtils;
 import siesgst.edu.in.tml16.utils.LocalDBHandler;
 import siesgst.edu.in.tml16.utils.OnlineDBDownloader;
@@ -59,7 +62,9 @@ public class RegistrationFragment extends Fragment implements Validator.Validati
 
     ProgressDialog progressDialog;
 
+    Tracker mTracker;
     Validator validator;
+
     public RegistrationFragment() {
         // Required empty public constructor
     }
@@ -140,6 +145,10 @@ public class RegistrationFragment extends Fragment implements Validator.Validati
                 validator.validate();
             }
         });
+
+        TMLApplication application = (TMLApplication) getActivity().getApplication();
+        mTracker = application.getDefaultTracker();
+
         return view;
     }
 
@@ -170,7 +179,10 @@ public class RegistrationFragment extends Fragment implements Validator.Validati
                                 public void run() {
                                     Toast.makeText(getActivity(), sharedPreferences.getString("reg_status", "") + " \nComplete your payment at the registration desk.", Toast.LENGTH_LONG).show();
                                     progressDialog.dismiss();
-                                    //Snackbar.make(v, sharedPreferences.getString("reg_status", ""), Snackbar.LENGTH_SHORT).show();
+                                    mTracker.send(new HitBuilders.EventBuilder()
+                                            .setCategory("Register for friend")
+                                            .setAction("Register")
+                                            .build());
                                 }
                             });
                         } else {

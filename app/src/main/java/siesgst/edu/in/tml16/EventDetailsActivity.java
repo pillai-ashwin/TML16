@@ -17,6 +17,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
+
 import java.util.ArrayList;
 
 import siesgst.edu.in.tml16.utils.ConnectionUtils;
@@ -26,11 +29,13 @@ import siesgst.edu.in.tml16.utils.OnlineDBDownloader;
 public class EventDetailsActivity extends AppCompatActivity {
 
     TextView description, eventDay, venue, head1, head2;
-    ImageView iconHead1, iconHead2;
+    ImageView iconHead1, iconHead2, detailImage;
 
-    String eventName;
+    String eventName, image;
 
     ProgressDialog progressDialog;
+
+    Tracker mTracker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +45,7 @@ public class EventDetailsActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         eventName = getIntent().getExtras().getString("event_name");
+        image = getIntent().getExtras().getString("type");
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 
@@ -61,6 +67,21 @@ public class EventDetailsActivity extends AppCompatActivity {
         head2 = (TextView) findViewById(R.id.event_detail_head2);
         iconHead1 = (ImageView) findViewById(R.id.icon_head1);
         iconHead2 = (ImageView) findViewById(R.id.icon_head2);
+        detailImage = (ImageView) findViewById(R.id.detail_image);
+
+        switch (image) {
+            case "tatva":
+                detailImage.setImageResource(R.drawable.tatva);
+                break;
+            case "moksh":
+                detailImage.setImageResource(R.drawable.moksh);
+                break;
+            case "lakshya":
+                detailImage.setImageResource(R.drawable.laskhya);
+                break;
+            default:
+                detailImage.setImageResource(R.mipmap.ic_launcher);
+        }
 
         final ArrayList<String> details = (new LocalDBHandler(this)).getEventKaSabKuch(eventName);
         description.setText(details.get(0));
@@ -86,6 +107,9 @@ public class EventDetailsActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        TMLApplication application = (TMLApplication) getApplication();
+        mTracker = application.getDefaultTracker();
     }
 
     public void showConfirmationDialog() {
@@ -130,6 +154,10 @@ public class EventDetailsActivity extends AppCompatActivity {
                         public void run() {
                             Toast.makeText(EventDetailsActivity.this, sharedPreferences.getString("reg_status", "") + " \nComplete your payment at the registration desk.", Toast.LENGTH_LONG).show();
                             progressDialog.dismiss();
+                            mTracker.send(new HitBuilders.EventBuilder()
+                                    .setCategory("Smart Register")
+                                    .setAction("Register")
+                                    .build());
                         }
                     });
             } else {

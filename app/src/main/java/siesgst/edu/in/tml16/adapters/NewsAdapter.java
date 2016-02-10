@@ -51,7 +51,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
         final FeedNews feedNews = feedNewsList.get(i);
         try {
             viewHolder.postIcon.setVisibility(View.VISIBLE);
-            Picasso.with(context).load(feedNews.getPostImage()).placeholder(R.mipmap.ic_launcher).into(viewHolder.postIcon);
+            Picasso.with(context).load(feedNews.getPostImage()).placeholder(R.drawable.facebook).into(viewHolder.postIcon);
         } catch (IllegalArgumentException e) {
             viewHolder.postIcon.setVisibility(View.GONE);
             //Picasso.with(context).load(R.mipmap.ic_launcher).into(viewHolder.postIcon);

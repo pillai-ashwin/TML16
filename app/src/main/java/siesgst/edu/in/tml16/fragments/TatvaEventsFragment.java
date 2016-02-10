@@ -18,10 +18,14 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
+
 import org.json.JSONArray;
 
 import siesgst.edu.in.tml16.EventDetailsActivity;
 import siesgst.edu.in.tml16.R;
+import siesgst.edu.in.tml16.TMLApplication;
 import siesgst.edu.in.tml16.adapters.EventAdapter;
 import siesgst.edu.in.tml16.helpers.ItemClickSupport;
 import siesgst.edu.in.tml16.utils.ConnectionUtils;
@@ -39,6 +43,8 @@ public class TatvaEventsFragment extends Fragment {
 
     CoordinatorLayout layout;
     SwipeRefreshLayout swipeRefreshLayout;
+
+    Tracker mTracker;
 
     public TatvaEventsFragment() {
         // Required empty public constructor
@@ -68,6 +74,12 @@ public class TatvaEventsFragment extends Fragment {
         });
 
         addClickSupport();
+
+        TMLApplication application = (TMLApplication) getActivity().getApplication();
+        mTracker = application.getDefaultTracker();
+
+        mTracker.setScreenName("Tatva");
+        mTracker.send(new HitBuilders.ScreenViewBuilder().build());
 
         return view;
     }
@@ -100,12 +112,16 @@ public class TatvaEventsFragment extends Fragment {
             if (!sharedPreferences.getString("nw_status", "").equals("bad")) {
                 new DataHandler(getActivity()).decodeAndPushJSON(array);
             } else {
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(getActivity(), "Check your internet connection...", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                try {
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getActivity(), "Check your internet connection...", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                } catch (NullPointerException e) {
+
+                }
             }
             return array;
         }
@@ -140,8 +156,16 @@ public class TatvaEventsFragment extends Fragment {
                 TextView eventName = (TextView) v.findViewById(R.id.event_name);
                 Intent intent = new Intent(getActivity(), EventDetailsActivity.class);
                 intent.putExtra("event_name", eventName.getText());
+                intent.putExtra("type", "tatva");
                 startActivity(intent);
             }
         });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mTracker.setScreenName("Tatva");
+        mTracker.send(new HitBuilders.ScreenViewBuilder().build());
     }
 }
