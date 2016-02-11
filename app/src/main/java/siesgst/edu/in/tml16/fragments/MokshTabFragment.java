@@ -45,6 +45,7 @@ public class MokshTabFragment extends Fragment {
         adapter.addFragment(new ExtravaganzaFragment(), "Extravaganza");
         adapter.addFragment(new MusicanaFragment(), "Musicana");
         adapter.addFragment(new ArtFragment(), "Art");
+        adapter.addFragment(new EDCFragment(), "EDC");
         viewPager.setAdapter(adapter);
     }
 }

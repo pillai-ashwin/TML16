@@ -68,6 +68,8 @@
         <item>Virtual Reality games</item>
     </string-array>-->
     <string name="title_activity_event_details">EventDetailsActivity</string>
+    <string name="title_activity_about">About Us</string>
+    <string name="read_more">Explore the culture, tradition, colors and emtions of India. Time for some phenomenal gaiety and tamasha. Naachenge, Gaayenge, Machayenge!</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

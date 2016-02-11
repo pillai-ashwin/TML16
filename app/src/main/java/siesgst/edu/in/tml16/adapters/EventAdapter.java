@@ -82,12 +82,16 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
 
         @Override
         protected Void doInBackground(Void... params) {
-            for (int i = 0; i < ((new LocalDBHandler(context)).getEventNamesAndDay(category, subCategory)).size() - 1; i = i + 2) {
+            try {
+                for (int i = 0; i < ((new LocalDBHandler(context)).getEventNamesAndDay(category, subCategory)).size() - 1; i = i + 2) {
                     feedEvents = new FeedEvents();
                     feedEvents.setEventName((new LocalDBHandler(context)).getEventNamesAndDay(category, subCategory).get(i));
                     feedEvents.setEventDay((new LocalDBHandler(context)).getEventNamesAndDay(category, subCategory).get(i + 1));
                     feedEventsList.add(feedEvents);
                 }
+            } catch (NullPointerException e) {
+
+            }
             return null;
         }
 

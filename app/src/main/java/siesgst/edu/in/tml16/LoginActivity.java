@@ -66,9 +66,30 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     Validator validator;
     OnlineDBDownloader db;
 
+    SharedPreferences sharedPreferences;
+    SharedPreferences.Editor editor;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                sharedPreferences = getSharedPreferences("TML", MODE_PRIVATE);
+                editor = sharedPreferences.edit();
+
+                boolean isFirstTime = sharedPreferences.getBoolean("firstTime", true);
+                if(isFirstTime) {
+                    startActivity(new Intent(LoginActivity.this, IntroActivity.class));
+                    editor.putBoolean("firstTime", false);
+                    editor.apply();
+                }
+            }
+        });
+
+        t.start();
+
         setContentView(R.layout.activity_login);
 
         validator = new Validator(this);
@@ -111,8 +132,8 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
     @Override
     public void onBackPressed() {
-        setResult(1);
-        finish();
+            setResult(1);
+            finish();
     }
 
     private void signIn() {

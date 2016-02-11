@@ -305,6 +305,13 @@ public class HomeActivity extends AppCompatActivity
                     }
                 }, 300);
                 break;
+            case R.id.about_us:
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        startActivity(new Intent(HomeActivity.this, AboutActivity.class));
+                    }
+                }, 300);
         }
         drawer.closeDrawer(GravityCompat.START);
         return true;
