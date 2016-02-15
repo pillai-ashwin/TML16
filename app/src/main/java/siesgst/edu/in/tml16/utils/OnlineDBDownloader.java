@@ -28,6 +28,7 @@ public class OnlineDBDownloader {
     final String regLink = "http://tml.siesgst.ac.in/validate/validate.php";
     final String fbLink = "https://graph.facebook.com/siesgst.TML/feed?fields=message,full_picture,likes.summary(true),comments.summary(true),link&&access_token=CAAXxzdZCX7lkBAGdnbDswtUqpEhCqEpQCOGsVwXBUI8WZBaGuc1hzKSvg7uuhjGfMkIiwpqAQoHSB9o7PyltY0PUXYusH5JV0Wsz9psIY19UV6tY6bUZCOHwtoGZAUWnMpq1Qwx3QAJO4kCs1YH6lijNFIgNemz71bxBiXse8sDQLnLXatIT0fegQt6fqYhpsuzeI2CJwgZDZD";
     final String userDetailsLink = "http://tml.siesgst.ac.in/includes/MobileUserProfile.php";
+    final String gcmLink = "http://tml.siesgst.ac.in/device_reg.php";
 
     private JSONArray JSON;
     private JSONArray userDetailsArray;
@@ -209,6 +210,35 @@ public class OnlineDBDownloader {
             writer.flush();
             editor.putString("uID", convertStreamToString(conn.getInputStream()));
             editor.apply();
+            writer.close();
+        } catch (IOException e) {
+
+        } finally {
+            if (conn != null)
+                conn.disconnect();
+        }
+    }
+
+    public void sendRegistrationIDtoServer (String token) {
+        String parameters = "regID=" + token;
+        byte[] postData = parameters.getBytes(Charset.forName("UTF-8"));
+        int postDataLength = postData.length;
+        HttpURLConnection conn = null;
+        try {
+            URL url = new URL(gcmLink);
+            conn = (HttpURLConnection) url.openConnection();
+            conn.setReadTimeout(100000);
+            conn.setConnectTimeout(150000);
+            conn.setRequestMethod("POST");
+            conn.setDoInput(true);
+            conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            conn.setRequestProperty("charset", "utf-8");
+            conn.setRequestProperty("Content-Length", Integer.toString(postDataLength));
+            conn.connect();
+            OutputStreamWriter writer = new OutputStreamWriter(conn.getOutputStream());
+            writer.write(parameters);
+            writer.flush();
+            Log.d("TML", convertStreamToString(conn.getInputStream()));
             writer.close();
         } catch (IOException e) {
 

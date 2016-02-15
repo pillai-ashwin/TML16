@@ -55,6 +55,7 @@ dependencies {
     compile 'com.mobsandgeeks:android-saripaar:1.0.2'
     compile 'com.github.paolorotolo:appintro:3.4.0'
     compile 'com.google.android.gms:play-services-analytics:8.4.0'
+    compile 'com.google.android.gms:play-services-gcm:8.4.0'
 }
 
 

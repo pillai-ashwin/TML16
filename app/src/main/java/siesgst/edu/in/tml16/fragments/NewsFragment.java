@@ -55,6 +55,9 @@ public class NewsFragment extends Fragment {
         recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
+        newsAdapter = new NewsAdapter(getActivity());
+        recyclerView.setAdapter(newsAdapter);
+
         swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.refresh_view);
         swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimaryDark, R.color.colorAccent);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -63,8 +66,6 @@ public class NewsFragment extends Fragment {
                 onRefreshData();
             }
         });
-
-        onRefreshData();
 
         TMLApplication application = (TMLApplication) getActivity().getApplication();
         mTracker = application.getDefaultTracker();

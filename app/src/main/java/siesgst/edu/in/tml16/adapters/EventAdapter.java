@@ -6,6 +6,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -23,6 +25,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
     List<FeedEvents> feedEventsList;
     Context context;
     FeedEvents feedEvents;
+    int lastPosition;
 
     String category, subCategory;
 
@@ -49,6 +52,12 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
 
         viewHolder.eventName.setText(feedEvents.getEventName());
         viewHolder.eventDay.setText(feedEvents.getEventDay());
+
+        Animation animation = AnimationUtils.loadAnimation(context,
+                (i > lastPosition) ? R.anim.up_from_bottom
+                        : R.anim.down_from_up);
+        viewHolder.itemView.setAnimation(animation);
+        lastPosition = i;
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
@@ -99,5 +108,11 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
         protected void onPostExecute(Void aVoid) {
             notifyDataSetChanged();
         }
+    }
+
+    @Override
+    public void onViewDetachedFromWindow(ViewHolder holder) {
+        super.onViewDetachedFromWindow(holder);
+        holder.itemView.clearAnimation();
     }
 }

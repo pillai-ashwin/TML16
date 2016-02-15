@@ -1,18 +1,25 @@
 package siesgst.edu.in.tml16;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -28,20 +35,27 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.gcm.GcmPubSub;
+import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import java.util.Calendar;
 
 import siesgst.edu.in.tml16.fragments.LakshyaEventsFragment;
 import siesgst.edu.in.tml16.fragments.MokshTabFragment;
 import siesgst.edu.in.tml16.fragments.NewsFragment;
 import siesgst.edu.in.tml16.fragments.RegistrationFragment;
 import siesgst.edu.in.tml16.fragments.TatvaEventsFragment;
+import siesgst.edu.in.tml16.services.RegistrationIntentService;
+import siesgst.edu.in.tml16.services.ServerCommunicationService;
 import siesgst.edu.in.tml16.utils.ConnectionUtils;
 import siesgst.edu.in.tml16.utils.DataHandler;
 import siesgst.edu.in.tml16.utils.LocalDBHandler;
 import siesgst.edu.in.tml16.utils.OnlineDBDownloader;
+import siesgst.edu.in.tml16.utils.RegistrationConstants;
 
 public class HomeActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.OnConnectionFailedListener {
@@ -64,6 +78,12 @@ public class HomeActivity extends AppCompatActivity
     private long mBackPressed;
 
     DrawerLayout drawer;
+
+    AlarmManager alarmManager;
+    PendingIntent pendingIntent;
+
+    BroadcastReceiver mRegistrationBroadcastReceiver;
+    String token;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -141,6 +161,28 @@ public class HomeActivity extends AppCompatActivity
             } else {
                 mEmail.setText(sharedPreferences.getString("email", ""));
             }
+
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    setUpAlarmManager();
+                }
+            }, 100000);
+
+            registerClient();
+
+        }
+
+    }
+
+    public void registerClient() {
+        // Get the sender ID
+        String senderId = getString(R.string.gcm_defaultSenderId);
+        if (!("".equals(senderId))) {
+
+            // Register with GCM
+            Intent intent = new Intent(this, RegistrationIntentService.class);
+            startService(intent);
         }
     }
 
@@ -318,7 +360,6 @@ public class HomeActivity extends AppCompatActivity
     }
 
     public void setUpHomeLayout() {
-        final ProgressDialog progressDialog = ProgressDialog.show(this, "", "Loading...");
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -327,12 +368,6 @@ public class HomeActivity extends AppCompatActivity
                         .commit();
             }
         }, 300);
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                progressDialog.dismiss();
-            }
-        }, 5000);
     }
 
     public void setUpFirstTimeLogin() {
@@ -437,5 +472,16 @@ public class HomeActivity extends AppCompatActivity
                 });
             }
         }
+    }
+
+    public void setUpAlarmManager() {
+        alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        Intent intent = new Intent(HomeActivity.this, ServerCommunicationService.class);
+        pendingIntent = PendingIntent.getService(this, 0, intent, 0);
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.set(Calendar.HOUR_OF_DAY, 3);
+        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_HALF_DAY, pendingIntent);
     }
 }
