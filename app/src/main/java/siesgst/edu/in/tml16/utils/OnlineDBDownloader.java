@@ -28,11 +28,12 @@ public class OnlineDBDownloader {
     final String regLink = "http://tml.siesgst.ac.in/validate/validate.php";
     final String fbLink = "https://graph.facebook.com/siesgst.TML/feed?fields=message,full_picture,likes.summary(true),comments.summary(true),link&&access_token=CAAXxzdZCX7lkBAGdnbDswtUqpEhCqEpQCOGsVwXBUI8WZBaGuc1hzKSvg7uuhjGfMkIiwpqAQoHSB9o7PyltY0PUXYusH5JV0Wsz9psIY19UV6tY6bUZCOHwtoGZAUWnMpq1Qwx3QAJO4kCs1YH6lijNFIgNemz71bxBiXse8sDQLnLXatIT0fegQt6fqYhpsuzeI2CJwgZDZD";
     final String userDetailsLink = "http://tml.siesgst.ac.in/includes/MobileUserProfile.php";
-    final String gcmLink = "http://tml.siesgst.ac.in/device_reg.php";
+    final String gcmLink = "http://tml.siesgst.ac.in/tml/GCM/device_reg.php";
 
-    private JSONArray JSON;
+    private JSONArray eventsJSON;
     private JSONArray userDetailsArray;
     private JSONArray regEventDetailsArray;
+    private JSONArray sponsorsJSON;
 
     private JSONObject fbObject;
     public boolean userExists;
@@ -62,7 +63,8 @@ public class OnlineDBDownloader {
             editor.remove("nw_status");
             editor.apply();
             JSONObject object = new JSONObject(convertStreamToString(conn.getInputStream()));
-            JSON = object.optJSONArray("events");
+            eventsJSON = object.optJSONArray("events");
+            sponsorsJSON = object.optJSONArray("sponsors");
         } catch (IOException e) {
             e.printStackTrace();
             editor.putString("nw_status", "bad");
@@ -219,8 +221,8 @@ public class OnlineDBDownloader {
         }
     }
 
-    public void sendRegistrationIDtoServer (String token) {
-        String parameters = "regID=" + token;
+    public void sendRegistrationIDtoServer (String token, String email) {
+        String parameters = "regID=" + token + "&" + "uEmail=" + email;
         byte[] postData = parameters.getBytes(Charset.forName("UTF-8"));
         int postDataLength = postData.length;
         HttpURLConnection conn = null;
@@ -272,7 +274,7 @@ public class OnlineDBDownloader {
     }
 
     public JSONArray getJSON() {
-        return JSON;
+        return eventsJSON;
     }
 
     public JSONObject getFBObject() {
@@ -282,6 +284,8 @@ public class OnlineDBDownloader {
     public JSONArray getUserDetailsArray() { return userDetailsArray;}
 
     public JSONArray getRegEventDetailsArray() { return regEventDetailsArray;}
+
+    public JSONArray getSponsorsJSON () { return sponsorsJSON; }
 
     public boolean getUserStatus() {
         return userExists;

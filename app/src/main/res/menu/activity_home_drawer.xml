@@ -40,6 +40,10 @@
             android:icon="@mipmap/ic_face_black_24dp"
             android:title="Profile" />
         <item
+            android:id="@+id/sponsors"
+            android:icon="@drawable/hs"
+            android:title="Sponsors"/>
+        <item
             android:id="@+id/sign_out"
             android:icon="@mipmap/ic_arrow_back_black_24dp"
             android:title="Sign Out" />
@@ -51,7 +55,7 @@
     <group android:id="@+id/group3">
         <item
             android:id="@+id/about_us"
-            android:icon="@mipmap/ic_face_black_24dp"
+            android:icon="@mipmap/ic_group_black_24dp"
             android:title="About us" />
     </group>
 </menu>

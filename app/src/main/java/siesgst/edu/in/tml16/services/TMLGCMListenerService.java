@@ -49,7 +49,7 @@ public class TMLGCMListenerService extends GcmListenerService {
         PendingIntent pendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
 
         Uri defaultRingtone = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        Bitmap imageBitmap;
+        //Bitmap imageBitmap;
 
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.ic_notify)
@@ -61,10 +61,8 @@ public class TMLGCMListenerService extends GcmListenerService {
                 .setLights(0xFFC107, 500, 3000)
                 .setVibrate(new long[]{200, 200, 200, 200})
                 .setSound(defaultRingtone)
-                .setPriority(NotificationCompat.PRIORITY_MAX);
-
-        NotificationCompat.BigPictureStyle bigPictureStyle = new NotificationCompat.BigPictureStyle();
-        notificationBuilder.setStyle(bigPictureStyle);
+                .setPriority(NotificationCompat.PRIORITY_MAX)
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(body));
 
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -72,13 +70,13 @@ public class TMLGCMListenerService extends GcmListenerService {
         int id = (int) Calendar.getInstance().getTimeInMillis();
 
         notificationManager.notify( id /* ID of notification */, notificationBuilder.build());
-        try {
+        /*try {
             imageBitmap = Picasso.with(getApplicationContext()).load("https://fbcdn-sphotos-g-a.akamaihd.net/hphotos-ak-xtl1/v/t1.0-9/s720x720/12717827_1079182818808498_6987844781615082742_n.jpg?oh=097818aee5121b8a37c03468b3a9cf0b&oe=57618CA9&__gda__=1461890998_31f21230ab4034884448e156f4ddd784").get();
             bigPictureStyle.bigPicture(imageBitmap);
             bigPictureStyle.setSummaryText(body);
             ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).notify(id, notificationBuilder.build());
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
     }
 }

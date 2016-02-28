@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -71,16 +72,16 @@ public class EventDetailsActivity extends AppCompatActivity {
 
         switch (image) {
             case "tatva":
-                detailImage.setImageResource(R.drawable.tatva);
+                Picasso.with(this).load("http://tml.siesgst.ac.in/img/app/header/tatva.png").placeholder(R.drawable.drawer_logo).into(detailImage);
                 break;
             case "moksh":
-                detailImage.setImageResource(R.drawable.moksh);
+                Picasso.with(this).load("http://tml.siesgst.ac.in/img/app/header/moksh.png").placeholder(R.drawable.drawer_logo).into(detailImage);
                 break;
             case "lakshya":
-                detailImage.setImageResource(R.drawable.laskhya);
+                Picasso.with(this).load("http://tml.siesgst.ac.in/img/app/header/lakshya.png").placeholder(R.drawable.drawer_logo).into(detailImage);
                 break;
             default:
-                detailImage.setImageResource(R.mipmap.ic_launcher);
+                detailImage.setImageResource(R.drawable.drawer_logo);
         }
 
         final ArrayList<String> details = (new LocalDBHandler(this)).getEventKaSabKuch(eventName);

@@ -45,7 +45,10 @@ public class LocalDBHandler extends SQLiteOpenHelper {
     final String F_LINK = "fLink";
     final String F_LIKES = "fLikes";
     final String F_COMMENTS = "fComments";
-    final String F_NEXT = "fNext";
+
+    final String S_NAME = "sName";
+    final String S_PATH = "sPath";
+    final String S_LINK = "sLink";
 
     final String PAYMENT_STATUS = "upayment_status";
 
@@ -56,6 +59,7 @@ public class LocalDBHandler extends SQLiteOpenHelper {
     final String REG_TABLE_NAME = "reg_table";
     final String FB_DATA_TABLE = "fb_data";
     final String REG_EVENT_DATA_TABLE = "reg_events_data";
+    final String SPONSORS_EVENTS = "sponsors";
 
     final String CREATE_USER_TABLE = "CREATE TABLE IF NOT EXISTS user_table(uID INTEGER PRIMARY KEY AUTOINCREMENT," +
             "uName VARCHAR DEFAULT NULL," +
@@ -98,6 +102,11 @@ public class LocalDBHandler extends SQLiteOpenHelper {
             "eName VARCHAR DEFAULT NULL," +
             "upayment_status VARCHAR DEFAULT NULL)";
 
+    final String CREATE_SPONSOR_TABLE = "CREATE TABLE IF NOT EXISTS sponsors(sID INTEGER PRIMARY KEY AUTOINCREMENT," +
+            "sName VARCHAR DEFAULT NULL," +
+            "sPath VARCHAR DEFAULT NULL," +
+            "sLink VARCHAR DEFAULT NULL)";
+
 
     public LocalDBHandler(Context context) {
         super(context, "tml_event_details", null, 1);
@@ -110,6 +119,7 @@ public class LocalDBHandler extends SQLiteOpenHelper {
         database.execSQL(CREATE_EVENT_TABLE);
         database.execSQL(CREATE_REG_TABLE);
         database.execSQL(CREATE_FB_DATA_TABLE);
+        database.execSQL(CREATE_SPONSOR_TABLE);
     }
 
     @Override
@@ -129,6 +139,8 @@ public class LocalDBHandler extends SQLiteOpenHelper {
         db.execSQL(CREATE_REG_TABLE);
         db.execSQL("DROP TABLE IF EXISTS " + REG_EVENT_DATA_TABLE);
         db.execSQL(CREATE_REG_EVENT_TABLE);
+        db.execSQL("DROP TABLE IF EXISTS " + SPONSORS_EVENTS);
+        db.execSQL(CREATE_SPONSOR_TABLE);
         db.close();
     }
 
@@ -150,6 +162,13 @@ public class LocalDBHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = getWritableDatabase();
         db.execSQL("DROP TABLE IF EXISTS " + REG_EVENT_DATA_TABLE);
         db.execSQL(CREATE_REG_EVENT_TABLE);
+        db.close();
+    }
+
+    public void dropSponsorsTable() {
+        SQLiteDatabase db = getWritableDatabase();
+        db.execSQL("DROP TABLE IF EXISTS " + SPONSORS_EVENTS);
+        db.execSQL(CREATE_SPONSOR_TABLE);
         db.close();
     }
 
@@ -231,6 +250,16 @@ public class LocalDBHandler extends SQLiteOpenHelper {
         values.put(E_NAME, data[0]);
         values.put(PAYMENT_STATUS, data[1]);
         db.insert(REG_EVENT_DATA_TABLE, null, values);
+        db.close();
+    }
+
+    public void insertSponsorData(String[] data) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(S_NAME, data[0]);
+        values.put(S_PATH, data[1]);
+        values.put(S_LINK, data[2]);
+        db.insert(SPONSORS_EVENTS, null, values);
         db.close();
     }
 
@@ -316,6 +345,21 @@ public class LocalDBHandler extends SQLiteOpenHelper {
         for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
             arrayList.add(cursor.getString(cursor.getColumnIndex(E_NAME)));
             arrayList.add(cursor.getString(cursor.getColumnIndex(PAYMENT_STATUS)));
+        }
+        cursor.close();
+        db.close();
+
+        return arrayList;
+    }
+
+    public ArrayList<String> getSponsorDetails() {
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.query(SPONSORS_EVENTS, new String[]{"*"}, null, null, null, null, null);
+        ArrayList<String> arrayList = new ArrayList<>();
+        for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+            arrayList.add(cursor.getString(cursor.getColumnIndex(S_NAME)));
+            arrayList.add(cursor.getString(cursor.getColumnIndex(S_PATH)));
+            arrayList.add(cursor.getString(cursor.getColumnIndex(S_LINK)));
         }
         cursor.close();
         db.close();

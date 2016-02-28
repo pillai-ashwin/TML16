@@ -38,7 +38,9 @@ public class RegistrationIntentService extends IntentService {
                     .getToken(getString(R.string.gcm_defaultSenderId), GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
             Log.d(TAG, "GCM Registration Token: " + token);
 
-            boolean isSent = sharedPreferences.getBoolean(RegistrationConstants.SENT_TOKEN_TO_SERVER, false);
+            new OnlineDBDownloader(getApplicationContext()).sendRegistrationIDtoServer(token, sharedPreferences.getString("email", ""));
+
+            /*boolean isSent = sharedPreferences.getBoolean(RegistrationConstants.SENT_TOKEN_TO_SERVER, false);
 
             // Register token with app server.
             if (!isSent) {
@@ -48,7 +50,7 @@ public class RegistrationIntentService extends IntentService {
                         new OnlineDBDownloader(getApplicationContext()).sendRegistrationIDtoServer(token);
                     }
                 }).start();
-            }
+            }*/
 
             sharedPreferences.edit().putBoolean(RegistrationConstants.SENT_TOKEN_TO_SERVER, true).apply();
         } catch (Exception e) {

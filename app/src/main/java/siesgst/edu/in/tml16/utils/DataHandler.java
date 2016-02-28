@@ -1,5 +1,6 @@
 package siesgst.edu.in.tml16.utils;
 
+import android.app.NotificationManager;
 import android.content.Context;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
@@ -18,9 +19,11 @@ public class DataHandler {
 
     Context context;
     JSONArray dataArray;
+    LocalDBHandler localDBHandler;
 
     public DataHandler(Context context) {
         this.context = context;
+        localDBHandler = new LocalDBHandler(context);
     }
 
     public void decodeAndPushJSON(JSONArray JSON) {
@@ -47,7 +50,24 @@ public class DataHandler {
                 data[10] = object.optString("eCreated");
                 data[11] = object.optString("eModified");
 
-                new LocalDBHandler(context).insertEventData(data);
+                localDBHandler.insertEventData(data);
+            }
+        } catch (NullPointerException e) {
+
+        }
+    }
+
+    public void pushSponsorData(JSONArray array) {
+        JSONObject object;
+        try {
+            for (int i = 0; i < array.length(); i++) {
+                object = array.optJSONObject(i);
+                String[] data = new String[3];
+                data[0] = object.optString("sName");
+                data[1] = object.optString("sPath");
+                data[2] = object.optString("sLink");
+
+                localDBHandler.insertSponsorData(data);
             }
         } catch (NullPointerException e) {
 

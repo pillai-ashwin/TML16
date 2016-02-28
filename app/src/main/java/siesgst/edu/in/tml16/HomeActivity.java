@@ -48,6 +48,7 @@ import siesgst.edu.in.tml16.fragments.LakshyaEventsFragment;
 import siesgst.edu.in.tml16.fragments.MokshTabFragment;
 import siesgst.edu.in.tml16.fragments.NewsFragment;
 import siesgst.edu.in.tml16.fragments.RegistrationFragment;
+import siesgst.edu.in.tml16.fragments.SponsorsFragment;
 import siesgst.edu.in.tml16.fragments.TatvaEventsFragment;
 import siesgst.edu.in.tml16.services.RegistrationIntentService;
 import siesgst.edu.in.tml16.services.ServerCommunicationService;
@@ -354,6 +355,18 @@ public class HomeActivity extends AppCompatActivity
                         startActivity(new Intent(HomeActivity.this, AboutActivity.class));
                     }
                 }, 300);
+            case R.id.sponsors:
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.root_frame, new SponsorsFragment())
+                                .commit();
+                        setTitle("Our Sponsors");
+                        title = "Our Sponsors";
+                    }
+                }, 300);
+                break;
         }
         drawer.closeDrawer(GravityCompat.START);
         return true;

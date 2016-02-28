@@ -69,7 +69,11 @@ public class ServerCommunicationService extends IntentService {
         object = downloader.getFBObject();
 
         if (!sharedPreferences.getString("nw_status", "").equals("bad")) {
-            new DataHandler(getApplicationContext()).pushFBData(object);
+            try {
+                new DataHandler(getApplicationContext()).pushFBData(object);
+            } catch (NullPointerException e) {
+
+            }
             Log.d("TMLCommunicationService", "Service has pushed FB data");
         }
 
